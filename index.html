@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SlurpQuest: The Noodle Passport</title>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<!-- FontAwesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<!-- Google Font for passport vibe -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Space+Mono:wght@400;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink: #241c15;
+    --paper: #fbf3e3;
+    --paper-dark: #f0e4c8;
+    --stamp-red: #c0392b;
+    --stamp-blue: #1f5c8b;
+    --stamp-green: #2e7d4f;
+    --accent: #e8792e;
+    --accent-2: #ffb703;
+    --gold: #b8860b;
+    --shadow: rgba(36,28,21,0.25);
+    --star-on: #ffb703;
+    --star-off: #d8cbb0;
+    --radius: 14px;
+    --font-display: 'Playfair Display', serif;
+    --font-mono: 'Space Mono', monospace;
+    --font-body: 'Poppins', sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family: var(--font-body);
+    background: linear-gradient(135deg,#2b2118,#453424 40%,#2b2118);
+    color: var(--ink);
+    min-height:100vh;
+    background-attachment: fixed;
+  }
+
+  /* ---------- HEADER ---------- */
+  header.app-header{
+    background: var(--paper);
+    background-image:
+      radial-gradient(circle at 20px 20px, rgba(36,28,21,0.04) 2px, transparent 0),
+      radial-gradient(circle at 60px 60px, rgba(36,28,21,0.04) 2px, transparent 0);
+    background-size: 80px 80px;
+    border-bottom: 6px double var(--ink);
+    padding: 22px 28px;
+    box-shadow: 0 6px 20px var(--shadow);
+    position: relative;
+  }
+  .header-inner{
+    max-width: 1200px;
+    margin: 0 auto;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+  .title-block h1{
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    margin:0;
+    letter-spacing: 0.5px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .title-block h1 i{ color: var(--accent); }
+  .title-block p.tagline{
+    margin: 4px 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: #5b4a36;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .passport-badge{
+    background: var(--paper-dark);
+    border: 2px solid var(--ink);
+    border-radius: var(--radius);
+    padding: 10px 18px;
+    display:flex;
+    gap: 22px;
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .stat{
+    text-align:center;
+    min-width: 88px;
+  }
+  .stat .num{
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight:800;
+    color: var(--stamp-red);
+    line-height:1;
+  }
+  .stat .label{
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color:#5b4a36;
+    margin-top:4px;
+  }
+
+  /* ---------- LAYOUT ---------- */
+  main{
+    max-width: 1200px;
+    margin: 24px auto 60px;
+    padding: 0 20px;
+    display:flex;
+    flex-direction:column;
+    gap: 28px;
+  }
+
+  .panel{
+    background: var(--paper);
+    border-radius: var(--radius);
+    border: 1px solid rgba(36,28,21,0.15);
+    box-shadow: 0 10px 30px var(--shadow);
+    padding: 20px;
+  }
+
+  .panel-title{
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin: 0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color: var(--ink);
+  }
+  .panel-title i{ color: var(--accent); }
+
+  /* ---------- MAP ---------- */
+  #map{
+    height: 420px;
+    width:100%;
+    border-radius: 10px;
+    border: 3px solid var(--ink);
+  }
+  .map-hint{
+    font-size: 0.8rem;
+    color:#5b4a36;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+  }
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    font-family: var(--font-body);
+    font-weight:600;
+    border:none;
+    border-radius: 8px;
+    padding: 10px 18px;
+    cursor:pointer;
+    font-size: 0.9rem;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); }
+  .btn-primary{ background: var(--accent); color:#fff; box-shadow: 0 4px 0 #a95415; }
+  .btn-primary:hover{ box-shadow: 0 6px 0 #a95415; }
+  .btn-secondary{ background: var(--paper-dark); color: var(--ink); border:1px solid var(--ink); }
+  .btn-danger{ background: transparent; color: var(--stamp-red); border: 1px solid var(--stamp-red); padding: 6px 10px; font-size:0.78rem; }
+
+  /* ---------- FILTERS ---------- */
+  .filters{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    margin-bottom: 18px;
+    align-items:center;
+  }
+  select, input[type=text], input[type=url], textarea{
+    font-family: var(--font-body);
+    padding: 9px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbb994;
+    background: #fff;
+    font-size: 0.9rem;
+  }
+
+  /* ---------- STAMP CARD GRID ---------- */
+  .card-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 22px;
+  }
+  .stamp-card{
+    position:relative;
+    background: #fffdf7;
+    border-radius: 10px;
+    padding: 16px;
+    border: 2px dashed #c9b98c;
+    transform: rotate(var(--tilt, -1deg));
+    box-shadow: 4px 6px 12px rgba(0,0,0,0.15);
+    transition: transform .2s ease;
+  }
+  .stamp-card:hover{ transform: rotate(0deg) scale(1.02); }
+  .stamp-card::before{
+    content: "";
+    position:absolute; inset:6px;
+    border: 1.5px solid rgba(192,57,43,0.35);
+    border-radius: 6px;
+    pointer-events:none;
+  }
+  .stamp-card img{
+    width:100%; height:150px; object-fit:cover; border-radius:6px;
+    filter: sepia(0.15);
+    margin-bottom:10px;
+    border: 1px solid #d8c9a3;
+  }
+  .stamp-card h3{
+    margin:0 0 2px;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+  }
+  .stamp-card .loc{
+    font-size: 0.78rem;
+    color:#6b5a42;
+    font-family: var(--font-mono);
+    margin-bottom: 8px;
+  }
+  .stamp-chip{
+    display:inline-block;
+    font-size: 0.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    color:#fff;
+    margin-bottom: 8px;
+  }
+  .stars-row{ display:flex; justify-content:space-between; font-size:0.78rem; margin: 4px 0; color:#5b4a36; }
+  .stars-row .stars i{ color: var(--star-off); font-size:0.8rem; }
+  .stars-row .stars i.filled{ color: var(--star-on); }
+  .stamp-card .memory{
+    font-size: 0.82rem;
+    font-style: italic;
+    color:#453424;
+    margin: 10px 0 6px;
+    border-left: 3px solid var(--accent);
+    padding-left: 8px;
+  }
+  .stamp-card .card-footer{
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+    margin-top: 10px;
+  }
+  .stamp-postmark{
+    position:absolute;
+    top: 10px; right: 10px;
+    width: 60px; height:60px;
+    border-radius:50%;
+    border: 2px solid var(--stamp-red);
+    color: var(--stamp-red);
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    font-weight:700;
+    transform: rotate(12deg);
+    opacity:0.85;
+    line-height:1.1;
+  }
+  .empty-state{
+    text-align:center;
+    padding: 40px 20px;
+    color:#7a6a52;
+    font-family: var(--font-mono);
+  }
+
+  /* ---------- BADGES ---------- */
+  .badges-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+    gap: 14px;
+  }
+  .badge{
+    border-radius: 10px;
+    padding: 14px;
+    text-align:center;
+    border: 2px solid var(--ink);
+    background: var(--paper-dark);
+    opacity: 0.35;
+    filter: grayscale(0.8);
+    transition: all .25s ease;
+  }
+  .badge.unlocked{
+    opacity: 1;
+    filter: none;
+    background: linear-gradient(160deg,#fff2d0,#ffe1a8);
+    box-shadow: 3px 3px 0 var(--gold);
+  }
+  .badge i{ font-size: 1.6rem; color: var(--accent); margin-bottom:6px; display:block; }
+  .badge .b-name{ font-weight:700; font-size:0.85rem; }
+  .badge .b-desc{ font-size:0.7rem; color:#5b4a36; margin-top:4px; }
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed; inset:0;
+    background: rgba(20,15,10,0.6);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal-overlay.open{ display:flex; }
+  .modal{
+    background: var(--paper);
+    border-radius: var(--radius);
+    max-width: 560px;
+    width:100%;
+    max-height: 90vh;
+    overflow-y:auto;
+    padding: 26px;
+    border: 3px solid var(--ink);
+    box-shadow: 8px 8px 0 rgba(0,0,0,0.35);
+    position:relative;
+  }
+  .modal h2{
+    font-family: var(--font-display);
+    margin-top:0;
+    display:flex; align-items:center; gap:10px;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:16px;
+    background:none; border:none; font-size:1.3rem; cursor:pointer; color: var(--ink);
+  }
+  .form-row{ margin-bottom: 14px; display:flex; flex-direction:column; gap:6px; }
+  .form-row label{ font-size:0.82rem; font-weight:600; }
+  .form-row-2{ display:flex; gap:12px; }
+  .form-row-2 .form-row{ flex:1; }
+  textarea{ resize: vertical; min-height: 70px; }
+  .star-picker{ display:flex; gap:6px; font-size:1.3rem; cursor:pointer; }
+  .star-picker i{ color: var(--star-off); transition: color .1s; }
+  .star-picker i.active{ color: var(--star-on); }
+  .rating-block{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .rating-block .rlabel{ font-size:0.85rem; font-weight:600; }
+  #photoPreview{
+    width:100%; max-height: 160px; object-fit:cover; border-radius:8px; margin-top:8px; display:none;
+    border: 1px solid #c9b98c;
+  }
+  .modal-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top: 18px; }
+
+  footer{
+    text-align:center;
+    color: #cbb994;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 20px;
+  }
+
+  @media (max-width:600px){
+    .header-inner{ flex-direction:column; align-items:flex-start; }
+    .passport-badge{ width:100%; justify-content:space-around; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-inner">
+    <div class="title-block">
+      <h1><i class="fa-solid fa-passport"></i> SlurpQuest</h1>
+      <p class="tagline">The Noodle Passport &mdash; Track Every Slurp Across the Globe</p>
+    </div>
+    <div class="passport-badge">
+      <div class="stat">
+        <div class="num" id="statTotal">0</div>
+        <div class="label">Noodles Logged</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statTopStyle">—</div>
+        <div class="label">Top Style</div>
+      </div>
+      <div class="stat">
+        <div class="num" id="statBadges">0</div>
+        <div class="label">Badges</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="panel">
+    <h2 class="panel-title"><i class="fa-solid fa-map-location-dot"></i> Noodle Map</h2>
+    <div id="map"></div>
+    <p class="map-hint"><i class="fa-solid fa-hand-pointer"></i> Click anywhere on the map to drop a pin & log a new noodle stop, or click "Log a Noodle Stop" below.</p>
+    <div style="margin-top:14px;">
+      <button class="btn btn-primary" id="openModalBtn"><i class="fa-solid fa-bowl-food"></i> Log a Noodle Stop</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title"><i class="fa-solid fa-award"></i> Achievement Badges</h2>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title"><i class="fa-solid fa-stamp"></i> Noodle Passport Stamps</h2>
+    <div class="filters">
+      <select id="filterType">
+        <option value="">All Noodle Types</option>
+      </select>
+      <select id="filterLocation">
+        <option value="">All Locations</option>
+      </select>
+      <button class="btn btn-secondary" id="clearFiltersBtn"><i class="fa-solid fa-rotate-left"></i> Clear Filters</button>
+    </div>
+    <div class="card-grid" id="cardGrid"></div>
+  </section>
+
+</main>
+
+<footer>SlurpQuest &copy; <span id="year"></span> &mdash; Made with broth, love, and a lot of napkins.</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
+    <h2><i class="fa-solid fa-passport"></i> Log a Noodle Stop</h2>
+    <form id="entryForm">
+      <div class="form-row-2">
+        <div class="form-row">
+          <label for="restName">Restaurant Name</label>
+          <input type="text" id="restName" required placeholder="e.g. Ichiran Ramen">
+        </div>
+        <div class="form-row">
+          <label for="restLocation">City / Country</label>
+          <input type="text" id="restLocation" required placeholder="e.g. Tokyo, Japan">
+        </div>
+      </div>
+
+      <div class="form-row-2">
+        <div class="form-row">
+          <label for="noodleType">Noodle Type</label>
+          <select id="noodleType" required>
+            <option value="Ramen">Ramen</option>
+            <option value="Pho">Pho</option>
+            <option value="Khao Soi">Khao Soi</option>
+            <option value="Tagliatelle">Tagliatelle</option>
+            <option value="Udon">Udon</option>
+            <option value="Pad Thai">Pad Thai</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label for="photoUrl">Photo URL</label>
+          <input type="url" id="photoUrl" placeholder="https://...">
+        </div>
+      </div>
+      <img id="photoPreview" alt="preview">
+
+      <div class="rating-block">
+        <span class="rlabel">Broth / Sauce Richness</span>
+        <span class="star-picker" data-target="richness">
+          <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+        </span>
+      </div>
+      <div class="rating-block">
+        <span class="rlabel">Noodle Texture / Chewiness</span>
+        <span class="star-picker" data-target="texture">
+          <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+        </span>
+      </div>
+      <div class="rating-block">
+        <span class="rlabel">Overall Vibe</span>
+        <span class="star-picker" data-target="vibe">
+          <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+        </span>
+      </div>
+
+      <div class="form-row">
+        <label for="memoryNotes">Notes / Road Trip Memory</label>
+        <textarea id="memoryNotes" placeholder="Tell the story of this slurp..."></textarea>
+      </div>
+
+      <input type="hidden" id="entryLat">
+      <input type="hidden" id="entryLng">
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-stamp"></i> Stamp Passport</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const STORAGE_KEY = 'slurpquest_entries_v1';
+
+  const NOODLE_COLORS = {
+    'Ramen': '#c0392b',
+    'Pho': '#1f5c8b',
+    'Khao Soi': '#b8860b',
+    'Tagliatelle': '#2e7d4f',
+    'Udon': '#6a3fa0',
+    'Pad Thai': '#e8792e',
+    'Other': '#555'
+  };
+
+  const DEFAULT_ENTRIES = [
+    {
+      id: 'default-1',
+      name: 'Ichiran Ramen',
+      location: 'Tokyo, Japan',
+      type: 'Ramen',
+      photo: 'https://images.unsplash.com/photo-1591814468924-caf88d1232e1?w=600&q=80',
+      lat: 35.6895, lng: 139.6917,
+      richness: 5, texture: 4, vibe: 5,
+      notes: 'The solo booths make you focus on nothing but the broth. Life changing tonkotsu.',
+      date: '2024-03-12'
+    },
+    {
+      id: 'default-2',
+      name: 'Pho 10 Ly Quoc Su',
+      location: 'Hanoi, Vietnam',
+      type: 'Pho',
+      photo: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=600&q=80',
+      lat: 21.0285, lng: 105.8542,
+      richness: 4, texture: 4, vibe: 5,
+      notes: 'Street-side plastic stools, herbs piled a mile high, and the best broth in the old quarter.',
+      date: '2024-01-05'
+    },
+    {
+      id: 'default-3',
+      name: 'Trattoria da Enzo',
+      location: 'Rome, Italy',
+      type: 'Tagliatelle',
+      photo: 'https://images.unsplash.com/photo-1621996346565-e3dbc353d2e5?w=600&q=80',
+      lat: 41.9028, lng: 12.4964,
+      richness: 5, texture: 5, vibe: 4,
+      notes: 'Cacio e pepe tagliatelle in Trastevere. Worth the wait in line.',
+      date: '2023-09-20'
+    }
+  ];
+
+  const BADGE_DEFS = [
+    { id:'ramen-rookie', name:'Ramen Rookie', desc:'Log 1 Ramen visit', icon:'fa-egg',
+      check: (entries)=> entries.filter(e=>e.type==='Ramen').length >= 1 },
+    { id:'global-slurper', name:'Global Slurper', desc:'Log 3 different countries', icon:'fa-earth-americas',
+      check: (entries)=> countryCount(entries) >= 3 },
+    { id:'noodle-novice', name:'Noodle Novice', desc:'Log 5 total noodle stops', icon:'fa-bowl-rice',
+      check: (entries)=> entries.length >= 5 },
+    { id:'broth-master', name:'Broth Master', desc:'Rate richness 5/5 three times', icon:'fa-fire',
+      check: (entries)=> entries.filter(e=>Number(e.richness)===5).length >= 3 },
+    { id:'variety-hunter', name:'Variety Hunter', desc:'Log 4 different noodle types', icon:'fa-shapes',
+      check: (entries)=> new Set(entries.map(e=>e.type)).size >= 4 },
+    { id:'pho-fanatic', name:'Pho Fanatic', desc:'Log 3 Pho visits', icon:'fa-leaf',
+      check: (entries)=> entries.filter(e=>e.type==='Pho').length >= 3 },
+    { id:'passport-stamped', name:'Fully Stamped', desc:'Log 10 total noodle stops', icon:'fa-passport',
+      check: (entries)=> entries.length >= 10 },
+    { id:'five-star-vibes', name:'Five-Star Vibes', desc:'Log an entry with a perfect overall score', icon:'fa-star',
+      check: (entries)=> entries.some(e=> Number(e.richness)===5 && Number(e.texture)===5 && Number(e.vibe)===5) }
+  ];
+
+  function countryCount(entries){
+    const countries = new Set();
+    entries.forEach(e=>{
+      const parts = e.location.split(',');
+      const country = parts[parts.length-1].trim().toLowerCase();
+      if(country) countries.add(country);
+    });
+    return countries.size;
+  }
+
+  // ---------- STATE ----------
+  let entries = loadEntries();
+  let map, markersLayer;
+  let pendingCoords = null;
+  const stars = { richness:0, texture:0, vibe:0 };
+
+  function loadEntries(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(Array.isArray(parsed) && parsed.length) return parsed;
+      }
+    }catch(e){ console.warn('Could not load entries', e); }
+    return DEFAULT_ENTRIES.slice();
+  }
+
+  function saveEntries(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+
+  // ---------- MAP ----------
+  function initMap(){
+    map = L.map('map').setView([20, 20], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
+
+    map.on('click', function(e){
+      pendingCoords = { lat: e.latlng.lat, lng: e.latlng.lng };
+      openModal();
+    });
+
+    renderMarkers();
+  }
+
+  function renderMarkers(){
+    markersLayer.clearLayers();
+    entries.forEach(entry=>{
+      if(entry.lat == null || entry.lng == null) return;
+      const color = NOODLE_COLORS[entry.type] || '#555';
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="background:${color};width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #241c15;display:flex;align-items:center;justify-content:center;box-shadow:2px 2px 4px rgba(0,0,0,.4);">
+                 <span style="transform:rotate(45deg);font-size:12px;">🍜</span>
+               </div>`,
+        iconSize: [26,26],
+        iconAnchor: [13,26]
+      });
+      const marker = L.marker([entry.lat, entry.lng], { icon }).addTo(markersLayer);
+      marker.bindPopup(`
+        <strong>${escapeHtml(entry.name)}</strong><br>
+        <em>${escapeHtml(entry.location)}</em><br>
+        ${escapeHtml(entry.type)} &middot; ${renderStarString(avgScore(entry))}
+      `);
+    });
+  }
+
+  function avgScore(e){
+    return ((Number(e.richness)+Number(e.texture)+Number(e.vibe))/3);
+  }
+  function renderStarString(avg){
+    const rounded = Math.round(avg);
+    let s = '';
+    for(let i=1;i<=5;i++) s += i<=rounded ? '★' : '☆';
+    return s;
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  // ---------- MODAL ----------
+  const modalOverlay = document.getElementById('modalOverlay');
+  const entryForm = document.getElementById('entryForm');
+
+  function openModal(){
+    modalOverlay.classList.add('open');
+    if(pendingCoords){
+      document.getElementById('entryLat').value = pendingCoords.lat.toFixed(5);
+      document.getElementById('entryLng').value = pendingCoords.lng.toFixed(5);
+    }
+  }
+  function closeModal(){
+    modalOverlay.classList.remove('open');
+    entryForm.reset();
+    document.getElementById('photoPreview').style.display = 'none';
+    pendingCoords = null;
+    stars.richness = 0; stars.texture = 0; stars.vibe = 0;
+    document.querySelectorAll('.star-picker').forEach(p=>updateStarPicker(p, 0));
+  }
+
+  document.getElementById('openModalBtn').addEventListener('click', openModal);
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  modalOverlay.addEventListener('click', function(e){
+    if(e.target === modalOverlay) closeModal();
+  });
+
+  document.getElementById('photoUrl').addEventListener('input', function(e){
+    const preview = document.getElementById('photoPreview');
+    if(e.target.value.trim()){
+      preview.src = e.target.value.trim();
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+
+  document.querySelectorAll('.star-picker').forEach(picker=>{
+    const target = picker.dataset.target;
+    picker.querySelectorAll('i').forEach(star=>{
+      star.addEventListener('click', function(){
+        const val = Number(star.dataset.val);
+        stars[target] = val;
+        updateStarPicker(picker, val);
+      });
+    });
+  });
+
+  function updateStarPicker(picker, val){
+    picker.querySelectorAll('i').forEach(star=>{
+      star.classList.toggle('active', Number(star.dataset.val) <= val);
+    });
+  }
+
+  entryForm.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    if(!stars.richness || !stars.texture || !stars.vibe){
+      alert('Please rate all three categories (Richness, Texture, Vibe) before stamping your passport!');
+      return;
+    }
+
+    const entry = {
+      id: 'entry-' + Date.now(),
+      name: document.getElementById('restName').value.trim(),
+      location: document.getElementById('restLocation').value.trim(),
+      type: document.getElementById('noodleType').value,
+      photo: document.getElementById('photoUrl').value.trim() || placeholderImg(document.getElementById('noodleType').value),
+      lat: document.getElementById('entryLat').value ? Number(document.getElementById('entryLat').value) : null,
+      lng: document.getElementById('entryLng').value ? Number(document.getElementById('entryLng').value) : null,
+      richness: stars.richness,
+      texture: stars.texture,
+      vibe: stars.vibe,
+      notes: document.getElementById('memoryNotes').value.trim(),
+      date: new Date().toISOString().slice(0,10)
+    };
+
+    entries.push(entry);
+    saveEntries();
+    renderMarkers();
+    renderAll();
+    closeModal();
+
+    if(entry.lat != null && entry.lng != null){
+      map.setView([entry.lat, entry.lng], 6);
+    }
+  });
+
+  function placeholderImg(type){
+    return `https://placehold.co/600x300/e8792e/fff?text=${encodeURIComponent(type)}`;
+  }
+
+  // ---------- FILTERS ----------
+  const filterType = document.getElementById('filterType');
+  const filterLocation = document.getElementById('filterLocation');
+  document.getElementById('clearFiltersBtn').addEventListener('click', function(){
+    filterType.value = '';
+    filterLocation.value = '';
+    renderCards();
+  });
+  filterType.addEventListener('change', renderCards);
+  filterLocation.addEventListener('change', renderCards);
+
+  function populateFilters(){
+    const types = Array.from(new Set(entries.map(e=>e.type))).sort();
+    const locations = Array.from(new Set(entries.map(e=>e.location))).sort();
+
+    const curType = filterType.value;
+    const curLoc = filterLocation.value;
+
+    filterType.innerHTML = '<option value="">All Noodle Types</option>' +
+      types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+    filterLocation.innerHTML = '<option value="">All Locations</option>' +
+      locations.map(l=>`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
+
+    filterType.value = curType;
+    filterLocation.value = curLoc;
+  }
+
+  // ---------- CARDS ----------
+  const cardGrid = document.getElementById('cardGrid');
+
+  function renderCards(){
+    const typeVal = filterType.value;
+    const locVal = filterLocation.value;
+
+    const filtered = entries.filter(e=>{
+      return (!typeVal || e.type === typeVal) && (!locVal || e.location === locVal);
+    });
+
+    if(!filtered.length){
+      cardGrid.innerHTML = `<div class="empty-state"><i class="fa-solid fa-bowl-food" style="font-size:2rem;"></i><p>No noodle stamps yet. Log your first slurp!</p></div>`;
+      return;
+    }
+
+    // newest first
+    const sorted = filtered.slice().sort((a,b)=> (b.date||'').localeCompare(a.date||''));
+
+    cardGrid.innerHTML = sorted.map(e=>{
+      const tilt = (Math.random()*3 - 1.5).toFixed(2);
+      const color = NOODLE_COLORS[e.type] || '#555';
+      return `
+      <div class="stamp-card" style="--tilt:${tilt}deg;">
+        <div class="stamp-postmark">SLURP<br>QUEST<br>${(e.date||'').replace(/-/g,'.')}</div>
+        <img src="${escapeHtml(e.photo || placeholderImg(e.type))}" alt="${escapeHtml(e.name)}" onerror="this.src='${placeholderImg(e.type)}'">
+        <span class="stamp-chip" style="background:${color};">${escapeHtml(e.type)}</span>
+        <h3>${escapeHtml(e.name)}</h3>
+        <div class="loc"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(e.location)}</div>
+        <div class="stars-row"><span>Richness</span><span class="stars">${starIcons(e.richness)}</span></div>
+        <div class="stars-row"><span>Texture</span><span class="stars">${starIcons(e.texture)}</span></div>
+        <div class="stars-row"><span>Vibe</span><span class="stars">${starIcons(e.vibe)}</span></div>
+        ${e.notes ? `<div class="memory">"${escapeHtml(e.notes)}"</div>` : ''}
+        <div class="card-footer">
+          <small style="color:#8a7a5f;">${e.date || ''}</small>
+          <button class="btn btn-danger" data-id="${e.id}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+
+    cardGrid.querySelectorAll('.btn-danger').forEach(btn=>{
+      btn.addEventListener('click', function(){
+        if(!confirm('Remove this noodle stamp from your passport?')) return;
+        entries = entries.filter(e=>e.id !== btn.dataset.id);
+        saveEntries();
+        renderMarkers();
+        renderAll();
+      });
+    });
+  }
+
+  function starIcons(val){
+    let out = '';
+    for(let i=1;i<=5;i++){
+      out += `<i class="fa-solid fa-star${i<=val ? ' filled':''}"></i>`;
+    }
+    return out;
+  }
+
+  // ---------- STATS + BADGES ----------
+  function renderStats(){
+    document.getElementById('statTotal').textContent = entries.length;
+
+    const counts = {};
+    entries.forEach(e=>{ counts[e.type] = (counts[e.type]||0)+1; });
+    let topStyle = '—';
+    let max = 0;
+    Object.keys(counts).forEach(k=>{
+      if(counts[k] > max){ max = counts[k]; topStyle = k; }
+    });
+    document.getElementById('statTopStyle').textContent = topStyle;
+
+    const unlocked = BADGE_DEFS.filter(b=>b.check(entries));
+    document.getElementById('statBadges').textContent = unlocked.length;
+  }
+
+  function renderBadges(){
+    const grid = document.getElementById('badgesGrid');
+    grid.innerHTML = BADGE_DEFS.map(b=>{
+      const isUnlocked = b.check(entries);
+      return `
+      <div class="badge ${isUnlocked ? 'unlocked':''}">
+        <i class="fa-solid ${b.icon}"></i>
+        <div class="b-name">${b.name}</div>
+        <div class="b-desc">${b.desc}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderAll(){
+    populateFilters();
+    renderCards();
+    renderStats();
+    renderBadges();
+  }
+
+  // ---------- INIT ----------
+  initMap();
+  renderAll();
+
+})();
+</script>
+</body>
+</html>
