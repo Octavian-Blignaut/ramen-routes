@@ -473,6 +473,128 @@
     .header-inner{ flex-direction:column; align-items:flex-start; }
     .passport-badge{ width:100%; justify-content:space-around; }
   }
+
+  /* ---------- TRAVELER IDENTITY ---------- */
+  .traveler-tag{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--panel-border);
+    border-radius: 999px;
+    padding: 6px 14px 6px 8px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color .2s ease, color .2s ease;
+  }
+  .traveler-tag:hover{ border-color: var(--gold-soft); color: var(--ink); }
+  .traveler-tag .t-dot{
+    width:10px; height:10px; border-radius:50%;
+    box-shadow: 0 0 8px currentColor;
+    flex-shrink:0;
+  }
+  .traveler-tag .t-edit{ opacity:0.5; font-size:0.68rem; }
+  .stamp-card .traveler-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size: 0.68rem;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .stamp-card .traveler-chip .t-dot{
+    width:8px; height:8px; border-radius:50%;
+    box-shadow: 0 0 6px currentColor;
+    flex-shrink:0;
+  }
+
+  /* ---------- RETRO CHATROOM ---------- */
+  .chat-window{
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: #050506;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.7);
+  }
+  .chat-titlebar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding: 8px 12px;
+    background: linear-gradient(90deg, rgba(255,43,69,0.25), rgba(212,175,55,0.15));
+    border-bottom: 1px solid var(--panel-border);
+    font-family: var(--font-mono);
+  }
+  .chat-dots{ display:flex; gap:6px; }
+  .chat-dots span{
+    width:10px; height:10px; border-radius:50%; display:inline-block;
+  }
+  .chat-dots span:nth-child(1){ background:#ff5f56; }
+  .chat-dots span:nth-child(2){ background:#ffbd2e; }
+  .chat-dots span:nth-child(3){ background:#27c93f; }
+  .chat-room-name{ color: var(--ink); font-weight:700; font-size:0.8rem; letter-spacing:0.5px; }
+  .chat-status{ margin-left:auto; font-size:0.68rem; color: var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+  .chat-status.online{ color:#27c93f; }
+  .chat-status.offline{ color: var(--crimson); }
+  .chat-body{ display:flex; }
+  .chat-log{
+    flex: 1;
+    height: 280px;
+    overflow-y: auto;
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--ink);
+    background:
+      repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 24px);
+  }
+  .chat-line{ margin-bottom: 4px; word-break: break-word; }
+  .chat-line .ts{ color: var(--muted); margin-right:6px; }
+  .chat-line .who{ font-weight:700; margin-right:4px; }
+  .chat-line.system{ color: var(--muted); font-style: italic; opacity:0.85; }
+  .chat-users{
+    width: 160px;
+    border-left: 1px solid var(--panel-border);
+    padding: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    background: rgba(255,255,255,0.015);
+    overflow-y:auto;
+  }
+  .chat-users-title{ color: var(--muted); text-transform:uppercase; letter-spacing:0.5px; font-size:0.65rem; margin-bottom:10px; }
+  .chat-users ul{ list-style:none; margin:0; padding:0; }
+  .chat-users li{ display:flex; align-items:center; gap:6px; margin-bottom:8px; color: var(--ink); }
+  .chat-users li .t-dot{ width:8px; height:8px; border-radius:50%; box-shadow:0 0 6px currentColor; flex-shrink:0; }
+  .chat-input-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--panel-border);
+    background: rgba(255,255,255,0.02);
+  }
+  .chat-prompt{ font-family: var(--font-mono); color: var(--gold-soft); font-weight:700; }
+  .chat-input-row input{
+    flex:1;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    padding: 8px 10px;
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+  .chat-input-row input:focus{ outline:none; border-color: var(--gold-soft); }
+  .btn-chat-send{ padding: 8px 14px; }
+
+  @media (max-width:700px){
+    .chat-body{ flex-direction:column; }
+    .chat-users{ width:auto; border-left:none; border-top:1px solid var(--panel-border); max-height:120px; }
+  }
 </style>
 </head>
 <body>
@@ -482,6 +604,11 @@
     <div class="title-block">
       <h1><i class="fa-solid fa-passport"></i> SlurpQuest</h1>
       <p class="tagline">道 &middot; The Way of the Noodle &middot; 一杯一杯</p>
+      <div class="traveler-tag" id="travelerTag" title="Click to rename yourself">
+        <span class="t-dot" id="travelerDot"></span>
+        <span id="travelerName">Traveler</span>
+        <i class="fa-solid fa-pen t-edit"></i>
+      </div>
     </div>
     <div class="passport-badge">
       <div class="stat">
@@ -525,9 +652,34 @@
       <select id="filterLocation">
         <option value="">All Locations</option>
       </select>
+      <select id="filterTraveler">
+        <option value="">All Travelers</option>
+      </select>
       <button class="btn btn-secondary" id="clearFiltersBtn"><i class="fa-solid fa-rotate-left"></i> Clear Filters</button>
     </div>
     <div class="card-grid" id="cardGrid"></div>
+  </section>
+  <section class="panel">
+    <h2 class="panel-title"><i class="fa-solid fa-comments"></i> Noodle Chat — Live Slurp Lounge</h2>
+    <div class="chat-window">
+      <div class="chat-titlebar">
+        <span class="chat-dots"><span></span><span></span><span></span></span>
+        <span class="chat-room-name">#slurpquest-lobby</span>
+        <span class="chat-status" id="chatStatus">connecting&hellip;</span>
+      </div>
+      <div class="chat-body">
+        <div class="chat-log" id="chatLog"></div>
+        <div class="chat-users">
+          <div class="chat-users-title">Who's Slurping (<span id="chatUserCount">0</span>)</div>
+          <ul id="chatUserList"></ul>
+        </div>
+      </div>
+      <form class="chat-input-row" id="chatForm">
+        <span class="chat-prompt">&gt;</span>
+        <input type="text" id="chatInput" maxlength="240" placeholder="Type a message... be kind, be noodly" autocomplete="off">
+        <button type="submit" class="btn btn-primary btn-chat-send"><i class="fa-solid fa-paper-plane"></i></button>
+      </form>
+    </div>
   </section>
 
 </main>
@@ -614,6 +766,46 @@
   document.getElementById('year').textContent = new Date().getFullYear();
 
   const STORAGE_KEY = 'slurpquest_entries_v1';
+  const TRAVELER_KEY = 'slurpquest_traveler_v1';
+
+  const TRAVELER_ADJECTIVES = ['Slurpy','Broth-bound','Wandering','Noodle-drunk','Steamy','Umami','Roaming','Chopstick-ready','Spice-chasing','Bowl-hopping'];
+  const TRAVELER_NOUNS = ['Wanderer','Ronin','Nomad','Pilgrim','Voyager','Sensei','Backpacker','Explorer','Drifter','Scout'];
+  const TRAVELER_COLORS = ['#ff2b45','#4aa3ff','#f0cd6c','#2ecc71','#b478ff','#ff8c3d','#4ee6c9','#ff5fa2'];
+
+  // ---------- TRAVELER IDENTITY (no-registration, auto-remembered per browser) ----------
+  function makeTravelerId(){
+    return 'traveler-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+  }
+
+  function makeTravelerName(){
+    const adj = TRAVELER_ADJECTIVES[Math.floor(Math.random()*TRAVELER_ADJECTIVES.length)];
+    const noun = TRAVELER_NOUNS[Math.floor(Math.random()*TRAVELER_NOUNS.length)];
+    return `${adj} ${noun}`;
+  }
+
+  function colorForTraveler(id){
+    let hash = 0;
+    for(let i=0;i<id.length;i++){ hash = (hash*31 + id.charCodeAt(i)) >>> 0; }
+    return TRAVELER_COLORS[hash % TRAVELER_COLORS.length];
+  }
+
+  function loadTraveler(){
+    try{
+      const raw = localStorage.getItem(TRAVELER_KEY);
+      if(raw){
+        const parsed = JSON.parse(raw);
+        if(parsed && parsed.id && parsed.name) return parsed;
+      }
+    }catch(e){ console.warn('Could not load traveler', e); }
+    const fresh = { id: makeTravelerId(), name: makeTravelerName() };
+    fresh.color = colorForTraveler(fresh.id);
+    localStorage.setItem(TRAVELER_KEY, JSON.stringify(fresh));
+    return fresh;
+  }
+
+  function saveTraveler(){
+    localStorage.setItem(TRAVELER_KEY, JSON.stringify(traveler));
+  }
 
   const NOODLE_COLORS = {
     'Ramen': '#ff2b45',
@@ -692,6 +884,9 @@
 
   // ---------- STATE ----------
   let entries = loadEntries();
+  let traveler = loadTraveler();
+  if(!traveler.color){ traveler.color = colorForTraveler(traveler.id); saveTraveler(); }
+  window.__slurpTraveler = traveler;
   let map, markersLayer;
   let pendingCoords = null;
   const stars = { richness:0, texture:0, vibe:0 };
@@ -787,6 +982,25 @@
     document.querySelectorAll('.star-picker').forEach(p=>updateStarPicker(p, 0));
   }
 
+  // ---------- TRAVELER TAG UI ----------
+  function renderTravelerTag(){
+    document.getElementById('travelerName').textContent = traveler.name;
+    document.getElementById('travelerDot').style.background = traveler.color;
+    document.getElementById('travelerDot').style.color = traveler.color;
+  }
+
+  document.getElementById('travelerTag').addEventListener('click', function(){
+    const next = prompt('What should we call you, traveler?', traveler.name);
+    if(next && next.trim()){
+      traveler.name = next.trim().slice(0, 40);
+      saveTraveler();
+      renderTravelerTag();
+      window.dispatchEvent(new CustomEvent('slurp:travelerRenamed', { detail: traveler }));
+    }
+  });
+
+  renderTravelerTag();
+
   document.getElementById('openModalBtn').addEventListener('click', openModal);
   document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
   document.getElementById('cancelBtn').addEventListener('click', closeModal);
@@ -841,7 +1055,10 @@
       texture: stars.texture,
       vibe: stars.vibe,
       notes: document.getElementById('memoryNotes').value.trim(),
-      date: new Date().toISOString().slice(0,10)
+      date: new Date().toISOString().slice(0,10),
+      travelerId: traveler.id,
+      travelerName: traveler.name,
+      travelerColor: traveler.color
     };
 
     entries.push(entry);
@@ -862,28 +1079,36 @@
   // ---------- FILTERS ----------
   const filterType = document.getElementById('filterType');
   const filterLocation = document.getElementById('filterLocation');
+  const filterTraveler = document.getElementById('filterTraveler');
   document.getElementById('clearFiltersBtn').addEventListener('click', function(){
     filterType.value = '';
     filterLocation.value = '';
+    filterTraveler.value = '';
     renderCards();
   });
   filterType.addEventListener('change', renderCards);
   filterLocation.addEventListener('change', renderCards);
+  filterTraveler.addEventListener('change', renderCards);
 
   function populateFilters(){
     const types = Array.from(new Set(entries.map(e=>e.type))).sort();
     const locations = Array.from(new Set(entries.map(e=>e.location))).sort();
+    const travelers = Array.from(new Map(entries.filter(e=>e.travelerId).map(e=>[e.travelerId, e.travelerName])).entries());
 
     const curType = filterType.value;
     const curLoc = filterLocation.value;
+    const curTraveler = filterTraveler.value;
 
     filterType.innerHTML = '<option value="">All Noodle Types</option>' +
       types.map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
     filterLocation.innerHTML = '<option value="">All Locations</option>' +
       locations.map(l=>`<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
+    filterTraveler.innerHTML = '<option value="">All Travelers</option>' +
+      travelers.map(([id,name])=>`<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
 
     filterType.value = curType;
     filterLocation.value = curLoc;
+    filterTraveler.value = curTraveler;
   }
 
   // ---------- CARDS ----------
@@ -892,9 +1117,10 @@
   function renderCards(){
     const typeVal = filterType.value;
     const locVal = filterLocation.value;
+    const travelerVal = filterTraveler.value;
 
     const filtered = entries.filter(e=>{
-      return (!typeVal || e.type === typeVal) && (!locVal || e.location === locVal);
+      return (!typeVal || e.type === typeVal) && (!locVal || e.location === locVal) && (!travelerVal || e.travelerId === travelerVal);
     });
 
     if(!filtered.length){
@@ -913,6 +1139,7 @@
         <div class="stamp-postmark">SLURP<br>QUEST<br>${(e.date||'').replace(/-/g,'.')}</div>
         <img src="${escapeHtml(e.photo || placeholderImg(e.type))}" alt="${escapeHtml(e.name)}" onerror="this.src='${placeholderImg(e.type)}'">
         <span class="stamp-chip" style="background:${color};">${escapeHtml(e.type)}</span>
+        ${e.travelerName ? `<div class="traveler-chip"><span class="t-dot" style="background:${e.travelerColor||'#9aa0ad'};color:${e.travelerColor||'#9aa0ad'};"></span>${escapeHtml(e.travelerName)}</div>` : ''}
         <h3>${escapeHtml(e.name)}</h3>
         <div class="loc"><i class="fa-solid fa-location-dot"></i> ${escapeHtml(e.location)}</div>
         <div class="stars-row"><span>Richness</span><span class="stars">${starIcons(e.richness)}</span></div>
@@ -987,6 +1214,172 @@
   renderAll();
 
 })();
+</script>
+
+<!-- ---------- LIVE CHAT (Firebase Realtime Database) ---------- -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+  import {
+    getDatabase, ref, push, set, remove, onValue, onChildAdded, onChildRemoved,
+    query, limitToLast, serverTimestamp, onDisconnect
+  } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+  import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBev9P4F-ZJstZ_qamX9gBpoYxT6b_IbFU",
+    authDomain: "ramen-routes.firebaseapp.com",
+    databaseURL: "https://ramen-routes-default-rtdb.firebaseio.com",
+    projectId: "ramen-routes",
+    storageBucket: "ramen-routes.firebasestorage.app",
+    messagingSenderId: "1040110247699",
+    appId: "1:1040110247699:web:e661bb71a6e0c9e9d644e6",
+    measurementId: "G-N1X7BNGPL8"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const auth = getAuth(app);
+
+  const chatLog = document.getElementById('chatLog');
+  const chatStatus = document.getElementById('chatStatus');
+  const chatUserList = document.getElementById('chatUserList');
+  const chatUserCount = document.getElementById('chatUserCount');
+  const chatForm = document.getElementById('chatForm');
+  const chatInput = document.getElementById('chatInput');
+
+  const SEND_COOLDOWN_MS = 2000;
+  let lastSentAt = 0;
+  let uid = null;
+  let presenceRef = null;
+
+  function currentTraveler(){
+    return window.__slurpTraveler || { id: 'guest', name: 'Traveler', color: '#9aa0ad' };
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(s){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[s];
+    });
+  }
+
+  function fmtTime(ts){
+    const d = ts ? new Date(ts) : new Date();
+    return d.toTimeString().slice(0,5);
+  }
+
+  function appendLine(node){
+    chatLog.appendChild(node);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  function appendMessage(msg){
+    const line = document.createElement('div');
+    line.className = 'chat-line';
+    line.innerHTML = `<span class="ts">[${fmtTime(msg.ts)}]</span><span class="who" style="color:${escapeHtml(msg.color || '#9aa0ad')}">${escapeHtml(msg.name || 'Traveler')}:</span><span class="txt">${escapeHtml(msg.text || '')}</span>`;
+    appendLine(line);
+  }
+
+  function appendSystem(text){
+    const line = document.createElement('div');
+    line.className = 'chat-line system';
+    line.textContent = `*** ${text}`;
+    appendLine(line);
+  }
+
+  function setStatus(text, cls){
+    chatStatus.textContent = text;
+    chatStatus.className = 'chat-status' + (cls ? ' ' + cls : '');
+  }
+
+  function renderUserList(usersObj){
+    const users = Object.values(usersObj || {});
+    chatUserCount.textContent = users.length;
+    chatUserList.innerHTML = users.map(function(u){
+      return `<li><span class="t-dot" style="background:${escapeHtml(u.color || '#9aa0ad')};color:${escapeHtml(u.color || '#9aa0ad')};"></span>${escapeHtml(u.name || 'Traveler')}</li>`;
+    }).join('');
+  }
+
+  // ---------- AUTH ----------
+  signInAnonymously(auth).catch(function(err){
+    console.warn('Chat auth failed', err);
+    setStatus('offline (auth error)', 'offline');
+  });
+
+  onAuthStateChanged(auth, function(user){
+    if(!user) return;
+    uid = user.uid;
+    setupPresence();
+    setupMessages();
+  });
+
+  // ---------- PRESENCE ----------
+  function setupPresence(){
+    presenceRef = ref(db, 'presence/' + uid);
+    const t = currentTraveler();
+
+    onValue(ref(db, '.info/connected'), function(snap){
+      if(snap.val() === true){
+        onDisconnect(presenceRef).remove();
+        set(presenceRef, { name: t.name, color: t.color, travelerId: t.id, ts: serverTimestamp() });
+        setStatus('online', 'online');
+      } else {
+        setStatus('offline', 'offline');
+      }
+    });
+
+    window.addEventListener('slurp:travelerRenamed', function(e){
+      const updated = e.detail || currentTraveler();
+      if(presenceRef){
+        set(presenceRef, { name: updated.name, color: updated.color, travelerId: updated.id, ts: serverTimestamp() });
+      }
+    });
+
+    const allPresenceRef = ref(db, 'presence');
+    let known = {};
+    onValue(allPresenceRef, function(snap){
+      known = snap.val() || {};
+      renderUserList(known);
+    });
+    onChildAdded(allPresenceRef, function(snap){
+      const u = snap.val();
+      if(u && snap.key !== uid) appendSystem(`${u.name} has entered the noodle house`);
+    });
+    onChildRemoved(allPresenceRef, function(snap){
+      const u = snap.val();
+      if(u) appendSystem(`${u.name} has slurped their last and left`);
+    });
+  }
+
+  // ---------- MESSAGES ----------
+  function setupMessages(){
+    const msgQuery = query(ref(db, 'chatMessages'), limitToLast(100));
+    onChildAdded(msgQuery, function(snap){
+      appendMessage(snap.val());
+    });
+  }
+
+  chatForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    const text = chatInput.value.trim();
+    if(!text) return;
+
+    const now = Date.now();
+    if(now - lastSentAt < SEND_COOLDOWN_MS){
+      appendSystem('slow down there, noodle enthusiast — wait a moment before sending again');
+      return;
+    }
+    lastSentAt = now;
+
+    const t = currentTraveler();
+    push(ref(db, 'chatMessages'), {
+      name: t.name,
+      color: t.color,
+      travelerId: t.id,
+      text: text.slice(0, 240),
+      ts: Date.now()
+    });
+    chatInput.value = '';
+  });
 </script>
 </body>
 </html>
