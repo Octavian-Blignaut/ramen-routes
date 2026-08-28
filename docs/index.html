@@ -449,9 +449,6 @@
   .form-row-2{ display:flex; gap:12px; }
   .form-row-2 .form-row{ flex:1; }
   textarea{ resize: vertical; min-height: 70px; }
-  .star-picker{ display:flex; gap:6px; font-size:1.3rem; cursor:pointer; }
-  .star-picker i{ color: var(--star-off); transition: color .1s; }
-  .star-picker i.active{ color: var(--star-on); filter: drop-shadow(0 0 6px rgba(240,205,108,0.5)); }
   .rating-block{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
   .rating-block .rlabel{ font-size:0.83rem; font-weight:600; color: var(--ink); }
   #photoPreview{
@@ -595,9 +592,143 @@
     .chat-body{ flex-direction:column; }
     .chat-users{ width:auto; border-left:none; border-top:1px solid var(--panel-border); max-height:120px; }
   }
+
+  /* ---------- SKIP LINK ---------- */
+  .skip-link{
+    position:absolute; left:-9999px; top:auto;
+    background: var(--gold-soft); color:#0a0a0d; font-weight:700;
+    padding: 10px 16px; border-radius: 4px; z-index: 2000;
+    font-family: var(--font-body); text-decoration:none;
+  }
+  .skip-link:focus{ left: 16px; top: 16px; }
+
+  /* ---------- FOCUS VISIBLE (a11y) ---------- */
+  a:focus-visible, button:focus-visible, .star-btn:focus-visible, [tabindex]:focus-visible{
+    outline: 2px solid var(--gold-soft);
+    outline-offset: 2px;
+  }
+
+  /* ---------- ACCESSIBLE STAR PICKER (buttons instead of bare icons) ---------- */
+  .star-picker{ display:flex; gap:2px; }
+  .star-btn{
+    background:none; border:none; cursor:pointer; padding:4px; font-size:1.3rem; color: var(--star-off);
+    transition: color .1s, transform .1s;
+  }
+  .star-btn:hover{ transform: scale(1.15); }
+  .star-btn.active{ color: var(--star-on); filter: drop-shadow(0 0 6px rgba(240,205,108,0.5)); }
+  .stars-row .stars .star-static{ color: var(--star-off); font-size:0.78rem; }
+  .stars-row .stars .star-static.filled{ color: var(--star-on); filter: drop-shadow(0 0 4px rgba(240,205,108,0.5)); }
+
+  /* ---------- STREAK STAT (extra passport-badge stat) ---------- */
+  .stat .num.streak-on{ color: var(--crimson); text-shadow: 0 0 16px var(--crimson-glow); }
+
+  /* ---------- QUEST GOAL PANEL ---------- */
+  .goal-row{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .goal-bar-track{
+    flex:1; min-width:180px; height: 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.06); border: 1px solid var(--panel-border);
+    overflow:hidden;
+  }
+  .goal-bar-fill{
+    height:100%; border-radius:999px;
+    background: linear-gradient(90deg, var(--crimson), var(--gold-soft));
+    transition: width .5s ease;
+  }
+  .goal-label{ font-family: var(--font-mono); font-size:0.78rem; color: var(--muted); white-space:nowrap; }
+  .goal-edit-btn{ padding:8px 14px; font-size:0.78rem; }
+
+  /* ---------- LEADERBOARD ---------- */
+  .leaderboard-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .leaderboard-list li{
+    display:flex; align-items:center; gap:12px; padding: 10px 12px;
+    border: 1px solid var(--panel-border); border-radius: 4px;
+    background: rgba(255,255,255,0.02);
+  }
+  .leaderboard-list li.me{ border-color: rgba(212,175,55,0.5); background: rgba(212,175,55,0.08); }
+  .leaderboard-rank{ font-family: var(--font-display); font-weight:700; color: var(--gold-soft); width:22px; }
+  .leaderboard-list .t-dot{ width:10px; height:10px; border-radius:50%; box-shadow:0 0 8px currentColor; flex-shrink:0; }
+  .leaderboard-name{ flex:1; font-size:0.85rem; }
+  .leaderboard-count{ font-family: var(--font-mono); font-size:0.78rem; color: var(--muted); }
+
+  /* ---------- FLOATING ACTION BUTTON (mobile-first quick log) ---------- */
+  .fab-log{
+    position: fixed;
+    right: 22px; bottom: 22px;
+    z-index: 500;
+    width: 60px; height:60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
+    color:#fff;
+    border:none;
+    box-shadow: 0 10px 30px -6px var(--crimson-glow), 0 0 0 1px rgba(212,175,55,0.3);
+    font-size: 1.4rem;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .fab-log:hover{ transform: translateY(-3px) scale(1.05); }
+  .fab-log:active{ transform: scale(0.95); }
+
+  /* ---------- TOASTS ---------- */
+  .toast-container{
+    position: fixed;
+    right: 22px; bottom: 96px;
+    z-index: 1500;
+    display:flex; flex-direction:column-reverse; gap:10px;
+    max-width: 320px;
+    pointer-events:none;
+  }
+  .toast{
+    background: linear-gradient(160deg, #17171b, #0e0e11);
+    border: 1px solid var(--panel-border);
+    border-left: 3px solid var(--gold-soft);
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-size: 0.85rem;
+    color: var(--ink);
+    box-shadow: 0 20px 40px -14px rgba(0,0,0,0.7);
+    display:flex; align-items:center; gap:10px;
+    animation: toast-in .25s ease;
+    pointer-events:auto;
+  }
+  .toast.toast-badge{ border-left-color: var(--crimson); }
+  .toast i{ color: var(--gold-soft); }
+  .toast.toast-badge i{ color: var(--crimson); }
+  @keyframes toast-in{ from{ opacity:0; transform: translateX(20px);} to{ opacity:1; transform:none; } }
+  .toast.leaving{ animation: toast-out .2s ease forwards; }
+  @keyframes toast-out{ to{ opacity:0; transform: translateX(20px); } }
+
+  /* ---------- CONFETTI CANVAS ---------- */
+  #confettiCanvas{
+    position: fixed; inset:0; width:100vw; height:100vh;
+    pointer-events:none; z-index: 1600;
+  }
+
+  /* ---------- CAMERA CAPTURE ---------- */
+  .photo-input-group{ display:flex; gap:8px; }
+  .photo-input-group input[type=url]{ flex:1; }
+  .btn-camera{
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.04);
+    color: var(--ink);
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    cursor:pointer;
+    font-size:0.9rem;
+  }
+  .btn-camera:hover{ border-color: var(--gold-soft); color: var(--gold-soft); }
+
+  @media (max-width:600px){
+    .fab-log{ right:16px; bottom:16px; }
+    .toast-container{ right:16px; bottom: 88px; max-width: calc(100vw - 32px); }
+  }
 </style>
 </head>
 <body>
+
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<canvas id="confettiCanvas" aria-hidden="true"></canvas>
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
 
 <header class="app-header">
   <div class="header-inner">
@@ -623,11 +754,26 @@
         <div class="num" id="statBadges">0</div>
         <div class="label">Badges</div>
       </div>
+      <div class="stat">
+        <div class="num" id="statStreak">0</div>
+        <div class="label">Day Streak</div>
+      </div>
     </div>
   </div>
 </header>
 
-<main>
+<main id="main-content">
+
+  <section class="panel">
+    <h2 class="panel-title"><i class="fa-solid fa-flag-checkered"></i> Quest Goal</h2>
+    <div class="goal-row">
+      <span class="goal-label" id="goalLabel">0 / 10 stops</span>
+      <div class="goal-bar-track" role="progressbar" id="goalBarTrack" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" aria-label="Quest goal progress">
+        <div class="goal-bar-fill" id="goalBarFill" style="width:0%;"></div>
+      </div>
+      <button type="button" class="btn btn-secondary goal-edit-btn" id="editGoalBtn"><i class="fa-solid fa-pen"></i> Set Goal</button>
+    </div>
+  </section>
 
   <section class="panel">
     <h2 class="panel-title"><i class="fa-solid fa-map-location-dot"></i> Noodle Map</h2>
@@ -644,15 +790,20 @@
   </section>
 
   <section class="panel">
+    <h2 class="panel-title"><i class="fa-solid fa-ranking-star"></i> Traveler Leaderboard</h2>
+    <ul class="leaderboard-list" id="leaderboardList"></ul>
+  </section>
+
+  <section class="panel">
     <h2 class="panel-title"><i class="fa-solid fa-stamp"></i> Noodle Passport Stamps</h2>
     <div class="filters">
-      <select id="filterType">
+      <select id="filterType" aria-label="Filter by noodle type">
         <option value="">All Noodle Types</option>
       </select>
-      <select id="filterLocation">
+      <select id="filterLocation" aria-label="Filter by location">
         <option value="">All Locations</option>
       </select>
-      <select id="filterTraveler">
+      <select id="filterTraveler" aria-label="Filter by traveler">
         <option value="">All Travelers</option>
       </select>
       <button class="btn btn-secondary" id="clearFiltersBtn"><i class="fa-solid fa-rotate-left"></i> Clear Filters</button>
@@ -684,13 +835,15 @@
 
 </main>
 
+<button class="fab-log" id="fabLogBtn" aria-label="Log a new noodle stop"><i class="fa-solid fa-bowl-food"></i></button>
+
 <footer>SlurpQuest &copy; <span id="year"></span> &mdash; 侍 Forged in broth &amp; discipline 侍</footer>
 
 <!-- MODAL -->
 <div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <button class="modal-close" id="modalCloseBtn"><i class="fa-solid fa-xmark"></i></button>
-    <h2><i class="fa-solid fa-passport"></i> Log a Noodle Stop</h2>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="modalCloseBtn" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+    <h2 id="modalTitle"><i class="fa-solid fa-passport"></i> Log a Noodle Stop</h2>
     <form id="entryForm">
       <div class="form-row-2">
         <div class="form-row">
@@ -717,28 +870,32 @@
           </select>
         </div>
         <div class="form-row">
-          <label for="photoUrl">Photo URL</label>
-          <input type="url" id="photoUrl" placeholder="https://...">
+          <label for="photoUrl">Photo</label>
+          <div class="photo-input-group">
+            <input type="url" id="photoUrl" placeholder="https://... or take a photo">
+            <button type="button" class="btn-camera" id="cameraBtn" aria-label="Take or upload a photo"><i class="fa-solid fa-camera"></i></button>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none;">
+          </div>
         </div>
       </div>
       <img id="photoPreview" alt="preview">
 
       <div class="rating-block">
-        <span class="rlabel">Broth / Sauce Richness</span>
-        <span class="star-picker" data-target="richness">
-          <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+        <span class="rlabel" id="richnessLabel">Broth / Sauce Richness</span>
+        <span class="star-picker" data-target="richness" role="group" aria-labelledby="richnessLabel">
+          <button type="button" class="star-btn" data-val="1" aria-label="1 star"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="2" aria-label="2 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="3" aria-label="3 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="4" aria-label="4 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="5" aria-label="5 stars"><i class="fa-solid fa-star"></i></button>
         </span>
       </div>
       <div class="rating-block">
-        <span class="rlabel">Noodle Texture / Chewiness</span>
-        <span class="star-picker" data-target="texture">
-          <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+        <span class="rlabel" id="textureLabel">Noodle Texture / Chewiness</span>
+        <span class="star-picker" data-target="texture" role="group" aria-labelledby="textureLabel">
+          <button type="button" class="star-btn" data-val="1" aria-label="1 star"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="2" aria-label="2 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="3" aria-label="3 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="4" aria-label="4 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="5" aria-label="5 stars"><i class="fa-solid fa-star"></i></button>
         </span>
       </div>
       <div class="rating-block">
-        <span class="rlabel">Overall Vibe</span>
-        <span class="star-picker" data-target="vibe">
-          <i class="fa-solid fa-star" data-val="1"></i><i class="fa-solid fa-star" data-val="2"></i><i class="fa-solid fa-star" data-val="3"></i><i class="fa-solid fa-star" data-val="4"></i><i class="fa-solid fa-star" data-val="5"></i>
+        <span class="rlabel" id="vibeLabel">Overall Vibe</span>
+        <span class="star-picker" data-target="vibe" role="group" aria-labelledby="vibeLabel">
+          <button type="button" class="star-btn" data-val="1" aria-label="1 star"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="2" aria-label="2 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="3" aria-label="3 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="4" aria-label="4 stars"><i class="fa-solid fa-star"></i></button><button type="button" class="star-btn" data-val="5" aria-label="5 stars"><i class="fa-solid fa-star"></i></button>
         </span>
       </div>
 
@@ -965,13 +1122,22 @@
   // ---------- MODAL ----------
   const modalOverlay = document.getElementById('modalOverlay');
   const entryForm = document.getElementById('entryForm');
+  let lastFocusedEl = null;
+
+  function getFocusableModalEls(){
+    return Array.from(modalOverlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter(el => !el.disabled && el.offsetParent !== null);
+  }
 
   function openModal(){
+    lastFocusedEl = document.activeElement;
     modalOverlay.classList.add('open');
     if(pendingCoords){
       document.getElementById('entryLat').value = pendingCoords.lat.toFixed(5);
       document.getElementById('entryLng').value = pendingCoords.lng.toFixed(5);
     }
+    const focusables = getFocusableModalEls();
+    if(focusables.length) focusables[0].focus();
   }
   function closeModal(){
     modalOverlay.classList.remove('open');
@@ -980,7 +1146,28 @@
     pendingCoords = null;
     stars.richness = 0; stars.texture = 0; stars.vibe = 0;
     document.querySelectorAll('.star-picker').forEach(p=>updateStarPicker(p, 0));
+    if(lastFocusedEl && typeof lastFocusedEl.focus === 'function') lastFocusedEl.focus();
   }
+
+  // Escape closes modal, Tab is trapped within it
+  document.addEventListener('keydown', function(e){
+    if(!modalOverlay.classList.contains('open')) return;
+    if(e.key === 'Escape'){
+      closeModal();
+      return;
+    }
+    if(e.key === 'Tab'){
+      const focusables = getFocusableModalEls();
+      if(!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if(e.shiftKey && document.activeElement === first){
+        e.preventDefault(); last.focus();
+      } else if(!e.shiftKey && document.activeElement === last){
+        e.preventDefault(); first.focus();
+      }
+    }
+  });
 
   // ---------- TRAVELER TAG UI ----------
   function renderTravelerTag(){
@@ -1002,6 +1189,7 @@
   renderTravelerTag();
 
   document.getElementById('openModalBtn').addEventListener('click', openModal);
+  document.getElementById('fabLogBtn').addEventListener('click', openModal);
   document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
   document.getElementById('cancelBtn').addEventListener('click', closeModal);
   modalOverlay.addEventListener('click', function(e){
@@ -1018,9 +1206,42 @@
     }
   });
 
+  // ---------- CAMERA CAPTURE (with client-side downscale to keep localStorage small) ----------
+  const cameraBtn = document.getElementById('cameraBtn');
+  const cameraInput = document.getElementById('cameraInput');
+  cameraBtn.addEventListener('click', function(){ cameraInput.click(); });
+  cameraInput.addEventListener('change', function(e){
+    const file = e.target.files && e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const img = new Image();
+      img.onload = function(){
+        const maxDim = 900;
+        let { width, height } = img;
+        if(width > maxDim || height > maxDim){
+          const scale = maxDim / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width; canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+        document.getElementById('photoUrl').value = dataUrl;
+        const preview = document.getElementById('photoPreview');
+        preview.src = dataUrl;
+        preview.style.display = 'block';
+        showToast('Photo captured! Ready to stamp.', 'info', 'fa-camera-retro');
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
   document.querySelectorAll('.star-picker').forEach(picker=>{
     const target = picker.dataset.target;
-    picker.querySelectorAll('i').forEach(star=>{
+    picker.querySelectorAll('.star-btn').forEach(star=>{
       star.addEventListener('click', function(){
         const val = Number(star.dataset.val);
         stars[target] = val;
@@ -1030,7 +1251,7 @@
   });
 
   function updateStarPicker(picker, val){
-    picker.querySelectorAll('i').forEach(star=>{
+    picker.querySelectorAll('.star-btn').forEach(star=>{
       star.classList.toggle('active', Number(star.dataset.val) <= val);
     });
   }
@@ -1061,11 +1282,20 @@
       travelerColor: traveler.color
     };
 
+    const unlockedBefore = new Set(BADGE_DEFS.filter(b=>b.check(entries)).map(b=>b.id));
+
     entries.push(entry);
     saveEntries();
     renderMarkers();
     renderAll();
     closeModal();
+
+    const newlyUnlocked = BADGE_DEFS.filter(b=> !unlockedBefore.has(b.id) && b.check(entries));
+    showToast(`Stamped! ${entry.name} added to your passport.`, 'info', 'fa-stamp');
+    newlyUnlocked.forEach(b=>{
+      showToast(`Badge unlocked: ${b.name}!`, 'badge', b.icon);
+    });
+    if(newlyUnlocked.length) fireConfetti();
 
     if(entry.lat != null && entry.lng != null){
       map.setView([entry.lat, entry.lng], 6);
@@ -1148,7 +1378,7 @@
         ${e.notes ? `<div class="memory">"${escapeHtml(e.notes)}"</div>` : ''}
         <div class="card-footer">
           <small style="color:#8a7a5f;">${e.date || ''}</small>
-          <button class="btn btn-danger" data-id="${e.id}"><i class="fa-solid fa-trash"></i></button>
+          <button class="btn btn-danger" data-id="${e.id}" aria-label="Delete stamp for ${escapeHtml(e.name)}"><i class="fa-solid fa-trash"></i></button>
         </div>
       </div>`;
     }).join('');
@@ -1160,6 +1390,7 @@
         saveEntries();
         renderMarkers();
         renderAll();
+        showToast('Stamp removed.', 'info', 'fa-trash');
       });
     });
   }
@@ -1167,9 +1398,144 @@
   function starIcons(val){
     let out = '';
     for(let i=1;i<=5;i++){
-      out += `<i class="fa-solid fa-star${i<=val ? ' filled':''}"></i>`;
+      out += `<i class="fa-solid fa-star star-static${i<=val ? ' filled':''}"></i>`;
     }
     return out;
+  }
+
+  // ---------- STREAKS ----------
+  function computeStreak(entries){
+    const dateSet = new Set(entries.map(e=>e.date).filter(Boolean));
+    if(!dateSet.size) return 0;
+    const oneDay = 86400000;
+    function toUTCms(str){
+      const [y, m, d] = str.split('-').map(Number);
+      return Date.UTC(y, m - 1, d);
+    }
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayMs = toUTCms(todayStr);
+    const yesterdayMs = todayMs - oneDay;
+    const yesterdayStr = new Date(yesterdayMs).toISOString().slice(0, 10);
+    // streak must include today or yesterday to still be "alive"
+    if(!dateSet.has(todayStr) && !dateSet.has(yesterdayStr)) return 0;
+    let cursorMs = dateSet.has(todayStr) ? todayMs : yesterdayMs;
+    let streak = 0;
+    while(dateSet.has(new Date(cursorMs).toISOString().slice(0, 10))){
+      streak++;
+      cursorMs -= oneDay;
+    }
+    return streak;
+  }
+
+  // ---------- QUEST GOAL ----------
+  const GOAL_KEY = 'slurpquest_goal_v1';
+  function loadGoal(){
+    const raw = localStorage.getItem(GOAL_KEY);
+    const n = Number(raw);
+    return (raw && n > 0) ? n : 10;
+  }
+  function saveGoal(n){ localStorage.setItem(GOAL_KEY, String(n)); }
+  let questGoal = loadGoal();
+
+  function renderGoal(){
+    const track = document.getElementById('goalBarTrack');
+    const fill = document.getElementById('goalBarFill');
+    const label = document.getElementById('goalLabel');
+    const pct = Math.min(100, Math.round((entries.length / questGoal) * 100));
+    fill.style.width = pct + '%';
+    track.setAttribute('aria-valuemax', String(questGoal));
+    track.setAttribute('aria-valuenow', String(entries.length));
+    label.textContent = `${entries.length} / ${questGoal} stops`;
+  }
+
+  document.getElementById('editGoalBtn').addEventListener('click', function(){
+    const next = prompt('How many noodle stops is your goal?', String(questGoal));
+    const n = Number(next);
+    if(next && n > 0){
+      questGoal = Math.floor(n);
+      saveGoal(questGoal);
+      renderGoal();
+      showToast(`Quest goal set to ${questGoal} stops!`, 'info', 'fa-flag-checkered');
+    }
+  });
+
+  // ---------- LEADERBOARD ----------
+  function renderLeaderboard(){
+    const list = document.getElementById('leaderboardList');
+    const counts = new Map(); // id -> {name, color, count}
+    entries.forEach(e=>{
+      if(!e.travelerId) return;
+      const cur = counts.get(e.travelerId) || { name: e.travelerName || 'Traveler', color: e.travelerColor || '#9aa0ad', count: 0 };
+      cur.count++;
+      counts.set(e.travelerId, cur);
+    });
+    const ranked = Array.from(counts.entries()).sort((a,b)=> b[1].count - a[1].count);
+    if(!ranked.length){
+      list.innerHTML = `<li>No travelers logged yet — be the first to stamp your passport!</li>`;
+      return;
+    }
+    list.innerHTML = ranked.map(([id, t], i)=>`
+      <li class="${id === traveler.id ? 'me' : ''}">
+        <span class="leaderboard-rank">#${i+1}</span>
+        <span class="t-dot" style="background:${t.color};color:${t.color};"></span>
+        <span class="leaderboard-name">${escapeHtml(t.name)}${id === traveler.id ? ' (you)' : ''}</span>
+        <span class="leaderboard-count">${t.count} stop${t.count===1?'':'s'}</span>
+      </li>`).join('');
+  }
+
+  // ---------- TOASTS ----------
+  function showToast(message, kind, icon){
+    const container = document.getElementById('toastContainer');
+    const el = document.createElement('div');
+    el.className = 'toast' + (kind === 'badge' ? ' toast-badge' : '');
+    el.setAttribute('role', 'status');
+    el.innerHTML = `<i class="fa-solid ${icon || 'fa-circle-info'}"></i><span>${escapeHtml(message)}</span>`;
+    container.appendChild(el);
+    setTimeout(()=>{
+      el.classList.add('leaving');
+      setTimeout(()=> el.remove(), 250);
+    }, 3800);
+  }
+
+  // ---------- CONFETTI ----------
+  function fireConfetti(){
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const colors = ['#ff2b45', '#d4af37', '#f0cd6c', '#2ecc71', '#4aa3ff'];
+    const pieces = Array.from({ length: 120 }, () => ({
+      x: Math.random() * canvas.width,
+      y: -20 - Math.random() * canvas.height * 0.3,
+      w: 6 + Math.random() * 6,
+      h: 6 + Math.random() * 10,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      vx: (Math.random() - 0.5) * 4,
+      vy: 3 + Math.random() * 4,
+      rot: Math.random() * Math.PI,
+      vr: (Math.random() - 0.5) * 0.3
+    }));
+    let frame = 0;
+    const maxFrames = 140;
+    function tick(){
+      frame++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p=>{
+        p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      if(frame < maxFrames){
+        requestAnimationFrame(tick);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    requestAnimationFrame(tick);
   }
 
   // ---------- STATS + BADGES ----------
@@ -1187,6 +1553,11 @@
 
     const unlocked = BADGE_DEFS.filter(b=>b.check(entries));
     document.getElementById('statBadges').textContent = unlocked.length;
+
+    const streak = computeStreak(entries);
+    const streakEl = document.getElementById('statStreak');
+    streakEl.textContent = streak;
+    streakEl.classList.toggle('streak-on', streak > 0);
   }
 
   function renderBadges(){
@@ -1207,6 +1578,8 @@
     renderCards();
     renderStats();
     renderBadges();
+    renderGoal();
+    renderLeaderboard();
   }
 
   // ---------- INIT ----------
