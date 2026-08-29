@@ -124,6 +124,24 @@ check('page renders with demo passport',
 check('map tiles + 3 pins placed',
   await evaluate(`return document.querySelectorAll('.leaflet-marker-icon').length`) === 3);
 
+check('map uses keyless OSM tiles, not Carto dark_all',
+  await evaluate(`
+    const src = [...document.querySelectorAll('script:not([src])')].map(s => s.textContent).join('\\n');
+    const tiles = [...document.querySelectorAll('.leaflet-tile')].map(i => i.src).join(' ');
+    return /tileLayer\\('https:\\/\\/\\{s\\}\\.tile\\.openstreetmap\\.org/.test(src)
+      && !/basemaps\\.cartocdn/.test(src + tiles);
+  `));
+
+check('notches live only on stamp cards',
+  await evaluate(`
+    const clip = el => el ? getComputedStyle(el).clipPath : 'none';
+    const none = v => !v || v === 'none';
+    return none(clip(document.querySelector('.panel')))
+      && none(clip(document.querySelector('.btn')))
+      && none(clip(document.querySelector('.badge')))
+      && /polygon/i.test(clip(document.querySelector('.stamp-card')));
+  `));
+
 check('header stats populated',
   await evaluate(`return document.getElementById('statTotal').textContent === '3'
                     && document.getElementById('statCountries').textContent === '3'`));

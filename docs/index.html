@@ -67,10 +67,10 @@
      silently outranks. Buttons and chips here are inline-flex, so without this
      they stay on screen after being hidden. */
   [hidden]{ display:none !important; }
-  ::selection{ background: var(--crimson); color:#fff; }
+  ::selection{ background: rgba(212,175,55,0.38); color: var(--ink); }
   ::-webkit-scrollbar{ width:10px; height:10px; }
   ::-webkit-scrollbar-track{ background: var(--bg-0); }
-  ::-webkit-scrollbar-thumb{ background: linear-gradient(var(--crimson), var(--gold)); border-radius:10px; }
+  ::-webkit-scrollbar-thumb{ background: var(--steel); border-radius:10px; }
 
   html{ scroll-behavior: smooth; }
 
@@ -152,7 +152,7 @@
     display:flex;
     align-items:center;
     gap:12px;
-    background: linear-gradient(120deg, #fff 10%, var(--gold-soft) 45%, var(--crimson) 90%);
+    background: linear-gradient(120deg, #fff 15%, var(--gold-soft) 70%, var(--gold) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -198,7 +198,7 @@
     font-size: 1.45rem;
     font-weight:700;
     color: var(--gold-soft);
-    text-shadow: 0 0 16px var(--crimson-glow);
+    text-shadow: 0 0 16px rgba(212,175,55,0.35);
     line-height:1.1;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -213,7 +213,7 @@
     margin-top:6px;
     font-family: var(--font-mono);
   }
-  .stat .num.streak-on{ color: var(--crimson-ink); text-shadow: 0 0 16px var(--crimson-glow); }
+  .stat .num.streak-on{ color: var(--gold-soft); text-shadow: 0 0 16px rgba(212,175,55,0.45); }
 
   /* ---------- SECTION NAV ---------- */
   .section-nav{
@@ -245,7 +245,7 @@
     white-space: nowrap;
   }
   .section-nav a:hover{ color: var(--ink); border-bottom-color: var(--panel-border-strong); }
-  .section-nav a[aria-current="true"]{ color: var(--gold-soft); border-bottom-color: var(--crimson); }
+  .section-nav a[aria-current="true"]{ color: var(--gold-soft); border-bottom-color: var(--gold-soft); }
 
   /* Compact header once the user scrolls — keeps the primary nav reachable
      without eating a third of a phone screen. */
@@ -274,13 +274,9 @@
     -webkit-backdrop-filter: blur(16px);
     border-radius: var(--radius);
     border: 1px solid var(--panel-border);
-    box-shadow: 0 25px 50px -20px var(--shadow);
+    box-shadow: 0 25px 50px -20px var(--shadow), 0 0 0 1px rgba(212,175,55,0.12);
     padding: 24px;
-    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
   }
-  /* clip-path would crop a focus ring on anything near the corners, so panels
-     containing focusable content drop the notch while focus is inside. */
-  .panel:focus-within{ clip-path: none; }
 
   .panel-title{
     font-family: var(--font-display);
@@ -294,9 +290,9 @@
     gap:10px;
     color: var(--ink);
     padding-left: 12px;
-    border-left: 3px solid var(--crimson);
+    border-left: 2px solid rgba(212,175,55,0.55);
   }
-  .panel-title i{ color: var(--gold-soft); }
+  .panel-title i{ color: var(--muted); }
   .panel-title .title-note{
     margin-left:auto;
     font-family: var(--font-mono);
@@ -318,7 +314,7 @@
     border-radius: var(--radius);
     padding: 14px 18px;
   }
-  .quest-strip .quest-icon{ color: var(--gold-soft); font-size: 1.1rem; }
+  .quest-strip .quest-icon{ color: var(--muted); font-size: 1.1rem; }
   .goal-bar-track{
     flex:1 1 200px; min-width:160px; height: 12px; border-radius: 999px;
     background: rgba(255,255,255,0.10); border: 1px solid var(--panel-border);
@@ -326,7 +322,7 @@
   }
   .goal-bar-fill{
     height:100%; border-radius:999px;
-    background: linear-gradient(90deg, var(--crimson), var(--gold-soft));
+    background: var(--gold-soft);
     transition: width .5s var(--ease);
   }
   .goal-label{ font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink); white-space:nowrap; }
@@ -348,6 +344,11 @@
     box-shadow: 0 0 0 1px rgba(212,175,55,0.15), inset 0 0 40px rgba(0,0,0,0.4);
     cursor: crosshair;
     z-index: 0;
+  }
+  /* OSM tiles inverted in-pane so markers/popups stay unfiltered. Carto's
+     dark_all layer now watermarks "API KEY REQUIRED" on every tile. */
+  .leaflet-tile-pane{
+    filter: invert(0.90) hue-rotate(180deg) brightness(0.95) saturate(0.35);
   }
   .leaflet-container{ background:#0b0b0e; font-family: var(--font-body); }
   .leaflet-popup-content-wrapper{
@@ -450,7 +451,6 @@
     justify-content:center;
     gap:8px;
     transition: transform .15s var(--ease), box-shadow .15s var(--ease), filter .15s var(--ease);
-    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   }
   .btn:hover{ transform: translateY(-2px); filter: brightness(1.1); }
   .btn:active{ transform: translateY(0); }
@@ -475,10 +475,9 @@
     background: transparent;
     color: var(--crimson-ink);
     border: 1px solid var(--crimson);
-    clip-path:none;
   }
   .btn-danger:hover{ background: rgba(255,43,69,0.14); }
-  .btn-sm{ min-height: 36px; padding: 6px 12px; font-size: 0.78rem; clip-path:none; }
+  .btn-sm{ min-height: 36px; padding: 6px 12px; font-size: 0.78rem; }
   /* Icon-only controls keep a 44px hit area even though the glyph is small. */
   .btn-icon{
     width: var(--tap); height: var(--tap);
@@ -566,7 +565,7 @@
   .stamp-card:hover, .stamp-card:focus-within{
     transform: rotate(0deg) translateY(-4px);
     border-color: rgba(212,175,55,0.45);
-    box-shadow: 0 24px 40px -16px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,43,69,0.2);
+    box-shadow: 0 24px 40px -16px rgba(0,0,0,0.8), 0 0 0 1px rgba(212,175,55,0.22);
   }
   .stamp-card:focus-within{ clip-path:none; }
   .stamp-card.highlight{
@@ -627,7 +626,7 @@
     font-style: italic;
     color: #ded9ce;
     margin: 12px 0 6px;
-    border-left: 2px solid var(--crimson);
+    border-left: 2px solid var(--gold);
     padding-left: 10px;
     display: -webkit-box;
     -webkit-line-clamp: 3;
@@ -651,16 +650,16 @@
     top: 12px; right: 12px;
     width: 54px; height:54px;
     border-radius:50%;
-    border: 1.5px solid var(--crimson);
+    border: 1.5px solid var(--gold);
     background: rgba(10,10,13,0.72);
-    color: var(--crimson-ink);
+    color: var(--gold-soft);
     display:flex; align-items:center; justify-content:center;
     text-align:center;
     font-family: var(--font-mono);
     font-size: 0.5rem;
     font-weight:700;
     line-height:1.1;
-    box-shadow: 0 0 14px rgba(255,43,69,0.25);
+    box-shadow: 0 0 14px rgba(212,175,55,0.28);
     pointer-events:none;
   }
   .traveler-chip{
@@ -687,7 +686,7 @@
     border: 1px dashed var(--panel-border-strong);
     border-radius: var(--radius);
   }
-  .empty-state i.es-icon{ font-size:2.2rem; color: var(--crimson); opacity:0.7; }
+  .empty-state i.es-icon{ font-size:2.2rem; color: var(--gold-soft); opacity:0.7; }
   .empty-state h3{ font-family: var(--font-display); color: var(--ink); margin: 14px 0 6px; font-size:1.05rem; letter-spacing:0.5px; }
   .empty-state p{ margin: 0 auto 18px; max-width: 42ch; line-height:1.6; font-size:0.82rem; }
 
@@ -704,18 +703,17 @@
     border: 1px solid var(--panel-border);
     background: rgba(255,255,255,0.025);
     transition: border-color .3s var(--ease), background .3s var(--ease), box-shadow .3s var(--ease);
-    clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%, 0 12px);
   }
   /* Locked badges used to sit at opacity .4, which put their text far below AA.
      They are now dimmed with colour + saturation instead of transparency. */
   .badge.locked i{ color: var(--steel); filter:none; }
   .badge.locked .b-name{ color: var(--muted); }
   .badge.unlocked{
-    background: linear-gradient(160deg, rgba(212,175,55,0.16), rgba(255,43,69,0.08));
+    background: linear-gradient(160deg, rgba(212,175,55,0.16), rgba(212,175,55,0.04));
     border-color: rgba(212,175,55,0.5);
     box-shadow: 0 0 24px -6px rgba(212,175,55,0.35);
   }
-  .badge i{ font-size: 1.5rem; color: var(--crimson-ink); margin-bottom:8px; display:block; }
+  .badge i{ font-size: 1.5rem; color: var(--steel); margin-bottom:8px; display:block; }
   .badge.unlocked i{ color: var(--gold-soft); filter: drop-shadow(0 0 8px rgba(212,175,55,0.6)); }
   .badge .b-name{ font-weight:700; font-size:0.85rem; font-family: var(--font-display); letter-spacing: 0.3px; color: var(--ink); }
   .badge .b-desc{ font-size:0.72rem; color: var(--muted); margin-top:5px; line-height:1.45; }
@@ -723,7 +721,7 @@
     margin-top:10px; height:5px; border-radius:999px;
     background: rgba(255,255,255,0.10); overflow:hidden;
   }
-  .badge-progress span{ display:block; height:100%; background: linear-gradient(90deg, var(--crimson), var(--gold-soft)); border-radius:999px; transition: width .5s var(--ease); }
+  .badge-progress span{ display:block; height:100%; background: var(--gold-soft); border-radius:999px; transition: width .5s var(--ease); }
   .badge-count{ font-family: var(--font-mono); font-size:0.66rem; color: var(--muted); margin-top:5px; }
   .badge.unlocked .badge-count{ color: var(--gold-soft); }
 
@@ -768,7 +766,7 @@
   .chat-status{ margin-left:auto; font-size:0.7rem; color: var(--muted); text-transform:uppercase; letter-spacing:0.5px; display:flex; align-items:center; gap:6px; }
   .chat-status::before{ content:""; width:8px; height:8px; border-radius:50%; background: currentColor; box-shadow:0 0 6px currentColor; }
   .chat-status.online{ color: var(--green); }
-  .chat-status.offline{ color: var(--crimson-ink); }
+  .chat-status.offline{ color: var(--muted); }
   .chat-body{ display:flex; position:relative; }
   .chat-log{
     flex: 1;
@@ -1010,7 +1008,7 @@
     display:flex; align-items:center; gap:10px;
     color: var(--ink);
   }
-  .modal h2 i{ color: var(--crimson-ink); }
+  .modal h2 i{ color: var(--muted); }
   .modal-close{
     position:absolute; top:14px; right:14px;
     width: var(--tap); height: var(--tap);
@@ -1094,7 +1092,7 @@
   .detail-meta span{ display:inline-flex; align-items:center; gap:7px; }
   .detail-ratings{ display:flex; flex-direction:column; gap:6px; margin: 12px 0 16px; }
   .detail-notes{
-    font-style:italic; color:#ded9ce; border-left:2px solid var(--crimson);
+    font-style:italic; color:#ded9ce; border-left:2px solid var(--gold);
     padding-left:12px; line-height:1.65; font-size:0.92rem; margin: 0 0 6px;
   }
 
@@ -1124,7 +1122,7 @@
     background: linear-gradient(135deg, var(--crimson), var(--crimson-dark));
     color:#fff;
     border:none;
-    box-shadow: 0 10px 30px -6px var(--crimson-glow), 0 0 0 1px rgba(212,175,55,0.3);
+    box-shadow: 0 10px 30px -6px var(--crimson-glow);
     font-family: var(--font-body); font-weight:700; font-size: 0.9rem;
     letter-spacing:0.3px;
     cursor:pointer;
@@ -1132,7 +1130,7 @@
     transition: transform .18s var(--ease), box-shadow .18s var(--ease);
   }
   .fab-log i{ font-size:1.15rem; }
-  .fab-log:hover{ transform: translateY(-3px); box-shadow: 0 16px 36px -6px var(--crimson-glow), 0 0 0 1px rgba(212,175,55,0.5); }
+  .fab-log:hover{ transform: translateY(-3px); box-shadow: 0 16px 36px -6px var(--crimson-glow); }
   .fab-log:active{ transform: translateY(0); }
 
   /* ---------- TOASTS ---------- */
@@ -1157,10 +1155,10 @@
     animation: toast-in .25s var(--ease);
     pointer-events:auto;
   }
-  .toast.toast-badge{ border-left-color: var(--crimson); }
+  .toast.toast-badge{ border-left-color: var(--gold-soft); }
   .toast.toast-error{ border-left-color: var(--crimson); }
   .toast i{ color: var(--gold-soft); flex-shrink:0; }
-  .toast.toast-badge i, .toast.toast-error i{ color: var(--crimson-ink); }
+  .toast.toast-error i{ color: var(--crimson-ink); }
   .toast span.t-msg{ flex:1; line-height:1.45; }
   .toast .t-action{
     background:none; border:1px solid var(--gold-soft); color: var(--gold-soft);
@@ -1199,7 +1197,7 @@
   .help-section{ margin-bottom: 20px; }
   .help-section h3{
     font-family: var(--font-display); font-size:0.95rem; letter-spacing:0.5px;
-    text-transform:uppercase; color: var(--gold-soft); margin: 0 0 8px;
+    text-transform:uppercase; color: var(--ink); margin: 0 0 8px;
   }
   .help-section p, .help-section li{ font-size:0.86rem; color: var(--muted); line-height:1.65; }
   .help-section ul{ margin: 0; padding-left: 20px; }
@@ -1213,7 +1211,8 @@
   }
 
   /* ---------- FOCUS VISIBLE (a11y) ----------
-     clip-path crops outlines, so focusable elements drop their notch while focused. */
+     Stamp cards still use clip-path; drop the notch while a child is focused
+     so the outline is not cropped. */
   a:focus-visible, button:focus-visible, input:focus-visible,
   select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible{
     outline: 3px solid var(--gold-soft);
@@ -1246,7 +1245,7 @@
     .stat{ min-width:0; flex:1; padding: 0 6px; }
     .stat .label{ font-size:0.6rem; letter-spacing:0; }
     main{ padding: 0 14px; margin-top: 20px; gap: 20px; }
-    .panel{ padding: 18px 16px; clip-path: none; }
+    .panel{ padding: 18px 16px; }
     .stamps-toolbar{ grid-template-columns: 1fr 1fr; }
     .stamps-toolbar .search-wrap{ grid-column: 1 / -1; }
     .card-grid{ grid-template-columns: 1fr; gap: 18px; }
@@ -2368,11 +2367,11 @@
 
   function initMap(){
     map = L.map('map', { worldCopyJump: true }).setView([20, 20], 2);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Raster OSM + a CSS invert on .leaflet-tile-pane. Carto dark_all now
+    // paints "API KEY REQUIRED" on every tile; this stays keyless.
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      subdomains: 'abcd',
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      // Keeps tiles painted while panning instead of flashing empty.
+      attribution: '&copy; OpenStreetMap contributors',
       updateWhenIdle: false,
       keepBuffer: 4
     }).addTo(map);
