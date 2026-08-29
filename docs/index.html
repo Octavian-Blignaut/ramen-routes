@@ -829,6 +829,148 @@
   .chat-count.warn{ color: var(--crimson-ink); }
   .btn-chat-send{ min-height: 40px; padding: 8px 16px; }
 
+  /* ---------- CHAT: ZONE TABS (MXit "chat zones") ---------- */
+  .zone-bar{
+    display:flex; align-items:center; gap:4px;
+    padding: 6px 8px;
+    background: rgba(0,0,0,0.35);
+    border-bottom: 1px solid var(--panel-border);
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .zone-bar::-webkit-scrollbar{ display:none; }
+  .zone-tab{
+    flex:0 0 auto;
+    background: none; border: 1px solid transparent;
+    color: var(--muted);
+    font-family: var(--font-mono); font-size: 0.74rem;
+    padding: 0 12px; min-height: 34px; border-radius: 3px;
+    cursor:pointer; white-space:nowrap;
+    display:inline-flex; align-items:center; gap:6px;
+  }
+  .zone-tab:hover{ color: var(--ink); border-color: var(--panel-border-strong); }
+  .zone-tab[aria-selected="true"]{
+    color: #0a0a0d; background: var(--gold-soft); border-color: var(--gold-soft); font-weight:700;
+  }
+  .zone-tab .zone-pop{ font-size:0.66rem; opacity:0.8; }
+  .zone-tab.full .zone-pop{ color: var(--crimson); }
+  .zone-tab[aria-selected="true"].full .zone-pop{ color: #7a0512; }
+
+  /* ---------- CHAT: CONNECT GATE ----------
+     Spark plan allows only 100 concurrent RTDB connections, so the socket is
+     not opened until somebody actually asks to join. */
+  .chat-gate{
+    padding: 34px 20px; text-align:center;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 24px);
+  }
+  .chat-gate p{
+    font-family: var(--font-mono); font-size:0.8rem; color: var(--muted);
+    max-width: 46ch; margin: 0 auto 18px; line-height:1.7;
+  }
+  .chat-gate .gate-title{
+    font-family: var(--font-display); font-size:1.05rem; letter-spacing:1px;
+    text-transform:uppercase; color: var(--ink); margin: 0 auto 10px; max-width:none;
+  }
+  .chat-gate .gate-note{ font-size:0.72rem; color: var(--steel); margin-top:16px; }
+
+  /* ---------- CHAT: IDENTITY BAR ---------- */
+  .chat-identity{
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+    padding: 8px 12px;
+    border-top: 1px solid var(--panel-border);
+    background: rgba(255,255,255,0.02);
+    font-family: var(--font-mono); font-size: 0.74rem; color: var(--muted);
+  }
+  .chat-identity .id-nick{
+    display:inline-flex; align-items:center; gap:7px;
+    color: var(--ink); font-weight:700;
+  }
+  .chat-identity .id-anon{
+    font-size:0.64rem; text-transform:uppercase; letter-spacing:1px;
+    border:1px solid var(--panel-border-strong); border-radius:2px;
+    padding: 2px 6px; color: var(--muted);
+  }
+  .chat-identity .id-spacer{ margin-left:auto; }
+  .chat-identity .btn-sm{ min-height: 32px; padding: 4px 10px; font-size:0.72rem; }
+
+  /* ---------- CHAT: MOOD + EMOTICON PICKERS ---------- */
+  .picker-pop{
+    position:absolute; bottom: calc(100% + 6px); right: 0;
+    background: var(--panel-solid);
+    border:1px solid var(--panel-border-strong); border-radius:4px;
+    box-shadow: 0 24px 48px -16px rgba(0,0,0,0.85);
+    padding: 8px; z-index: 40;
+    display:none;
+  }
+  .picker-pop.open{ display:block; }
+  .picker-pop .pop-head{
+    font-family: var(--font-mono); font-size:0.64rem; text-transform:uppercase;
+    letter-spacing:1px; color: var(--muted); margin: 2px 4px 8px;
+  }
+  .mood-grid{ display:grid; grid-template-columns: repeat(2, minmax(120px,1fr)); gap:4px; }
+  .mood-btn{
+    display:flex; align-items:center; gap:8px;
+    background:none; border:1px solid transparent; border-radius:3px;
+    color: var(--ink); font-family: var(--font-mono); font-size:0.74rem;
+    padding: 0 10px; min-height: 36px; cursor:pointer; text-align:left;
+  }
+  .mood-btn:hover{ border-color: var(--gold-soft); background: rgba(212,175,55,0.1); }
+  .mood-btn[aria-checked="true"]{ background: rgba(212,175,55,0.18); border-color: var(--gold-soft); }
+  .emo-grid{ display:grid; grid-template-columns: repeat(6, 40px); gap:2px; }
+  .emo-btn{
+    width:40px; height:40px; font-size:1.15rem; line-height:1;
+    background:none; border:1px solid transparent; border-radius:3px; cursor:pointer;
+  }
+  .emo-btn:hover{ border-color: var(--gold-soft); background: rgba(212,175,55,0.12); }
+
+  /* ---------- CHAT: MESSAGE KINDS ---------- */
+  .chat-line .mood-tag{ font-size:0.86em; margin-right:3px; }
+  .chat-line.action{ color: var(--gold-soft); font-style:italic; }
+  .chat-line.buzz{
+    color: var(--crimson-ink); font-weight:700;
+    animation: buzz-shake .4s var(--ease);
+  }
+  @keyframes buzz-shake{
+    0%,100%{ transform: translateX(0); }
+    20%{ transform: translateX(-4px); }
+    40%{ transform: translateX(4px); }
+    60%{ transform: translateX(-2px); }
+    80%{ transform: translateX(2px); }
+  }
+  .chat-line .emo{ font-style:normal; }
+  .chat-users li .mood-tag{ margin-left:auto; }
+  .chat-users li .u-status{
+    display:block; width:100%; color: var(--steel); font-size:0.66rem;
+    padding-left: 15px; margin-top:-4px;
+  }
+  .chat-users li{ flex-wrap:wrap; }
+  .chat-users li.ignored{ opacity:0.45; text-decoration: line-through; }
+
+  /* ---------- CHAT: FOOTER METER ---------- */
+  .chat-meter{
+    display:flex; align-items:center; gap: 10px; flex-wrap:wrap;
+    padding: 7px 12px;
+    border-top: 1px solid var(--panel-border);
+    background: rgba(0,0,0,0.3);
+    font-family: var(--font-mono); font-size: 0.68rem; color: var(--steel);
+  }
+  .chat-meter .meter-spacer{ margin-left:auto; }
+  .chat-meter b{ color: var(--muted); font-weight:400; }
+  .chat-meter button{
+    background:none; border:none; color: var(--muted); cursor:pointer;
+    font-family: var(--font-mono); font-size:0.68rem; text-decoration:underline;
+    padding: 4px 8px; min-height: 28px;
+  }
+  .chat-meter button:hover{ color: var(--gold-soft); }
+
+  .chat-input-row{ position: relative; }
+  .chat-input-row .icon-slot{ position: relative; }
+
+  @media (max-width:680px){
+    .mood-grid{ grid-template-columns: 1fr; }
+    .emo-grid{ grid-template-columns: repeat(5, 40px); }
+    .picker-pop{ right: -40px; }
+  }
+
   /* ---------- MODALS / DIALOGS ---------- */
   .modal-overlay{
     position:fixed; inset:0;
@@ -1321,34 +1463,106 @@
 
   <section class="panel" id="section-chat" aria-labelledby="chatHeading">
     <h2 class="panel-title" id="chatHeading">
-      <i class="fa-solid fa-comments" aria-hidden="true"></i> Noodle Chat &mdash; Live Slurp Lounge
+      <i class="fa-solid fa-comments" aria-hidden="true"></i> Slurp Lounge &mdash; Chat Zones
+      <span class="title-note">anonymous by default</span>
     </h2>
+
     <div class="chat-window">
       <div class="chat-titlebar">
         <span class="chat-dots" aria-hidden="true"><span></span><span></span><span></span></span>
-        <span class="chat-room-name">#slurpquest-lobby</span>
-        <span class="chat-status" id="chatStatus" role="status">connecting&hellip;</span>
+        <span class="chat-room-name" id="chatZoneName">#lobby</span>
+        <span class="chat-status" id="chatStatus" role="status">offline</span>
       </div>
-      <div class="chat-body">
-        <div class="chat-log" id="chatLog" role="log" aria-label="Chat messages" aria-live="polite" tabindex="0"></div>
-        <button type="button" class="chat-jump" id="chatJumpBtn">
-          <i class="fa-solid fa-arrow-down" aria-hidden="true"></i> Jump to latest
+
+      <!-- The socket stays shut until somebody asks to join: the Spark plan
+           allows only 100 concurrent connections across the whole project. -->
+      <div class="chat-gate" id="chatGate">
+        <p class="gate-title">Enter the Slurp Lounge</p>
+        <p>
+          Public chat zones, dial-up style. You join as an anonymous handle &mdash; no email,
+          no signup, no profile needed. Add a nickname later only if you feel like it.
+        </p>
+        <button type="button" class="btn btn-primary" id="chatConnectBtn">
+          <i class="fa-solid fa-plug" aria-hidden="true"></i> Connect to the lounge
         </button>
-        <div class="chat-users">
-          <div class="chat-users-title">Who&rsquo;s slurping (<span id="chatUserCount">0</span>)</div>
-          <ul id="chatUserList"></ul>
+        <p class="gate-note">Nothing connects until you press this. Messages are public and kept for 12 hours.</p>
+      </div>
+
+      <div id="chatLive" hidden>
+        <div class="zone-bar" id="zoneBar" role="tablist" aria-label="Chat zones"></div>
+
+        <div class="chat-body">
+          <div class="chat-log" id="chatLog" role="log" aria-label="Chat messages" aria-live="polite" tabindex="0"></div>
+          <button type="button" class="chat-jump" id="chatJumpBtn">
+            <i class="fa-solid fa-arrow-down" aria-hidden="true"></i> Jump to latest
+          </button>
+          <div class="chat-users">
+            <div class="chat-users-title">In this zone (<span id="chatUserCount">0</span>)</div>
+            <ul id="chatUserList"></ul>
+          </div>
+        </div>
+
+        <div class="chat-identity">
+          <span>Chatting as</span>
+          <span class="id-nick">
+            <span class="t-dot" id="chatMyDot"></span>
+            <span id="chatMyNick">&mdash;</span>
+            <span id="chatMyMood" aria-hidden="true"></span>
+          </span>
+          <span class="id-anon" id="chatAnonBadge">anonymous</span>
+          <span class="id-spacer"></span>
+          <button type="button" class="btn btn-secondary btn-sm" id="chatNickBtn">
+            <i class="fa-solid fa-signature" aria-hidden="true"></i> Nickname
+          </button>
+        </div>
+
+        <form class="chat-input-row" id="chatForm">
+          <span class="chat-prompt" aria-hidden="true">&gt;</span>
+          <label for="chatInput" class="visually-hidden">Chat message. Dot commands such as .help are supported.</label>
+          <input type="text" id="chatInput" maxlength="200"
+                 placeholder="Say something noodly, or .help" autocomplete="off"
+                 aria-describedby="chatInputHint">
+          <span id="chatInputHint" class="visually-hidden">Dot commands: .nick, .mood, .me, .join, .who, .buzz, .ignore, .help</span>
+          <span class="chat-count" id="chatCount" aria-hidden="true">200</span>
+
+          <span class="icon-slot">
+            <button type="button" class="btn-icon" id="moodBtn" aria-expanded="false"
+                    aria-controls="moodPop" aria-label="Set your mood">
+              <i class="fa-regular fa-face-smile" aria-hidden="true"></i>
+            </button>
+            <div class="picker-pop" id="moodPop" role="radiogroup" aria-label="Mood">
+              <p class="pop-head">Your mood</p>
+              <div class="mood-grid" id="moodGrid"></div>
+            </div>
+          </span>
+
+          <span class="icon-slot">
+            <button type="button" class="btn-icon" id="emoBtn" aria-expanded="false"
+                    aria-controls="emoPop" aria-label="Insert an emoticon">
+              <i class="fa-solid fa-icons" aria-hidden="true"></i>
+            </button>
+            <div class="picker-pop" id="emoPop">
+              <p class="pop-head">Emoticons</p>
+              <div class="emo-grid" id="emoGrid"></div>
+            </div>
+          </span>
+
+          <button type="submit" class="btn btn-primary btn-chat-send">
+            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+            <span class="visually-hidden">Send message</span>
+          </button>
+        </form>
+
+        <div class="chat-meter">
+          <span title="Approximate JSON payload moved this session, excluding protocol overhead">
+            <i class="fa-solid fa-arrows-up-down" aria-hidden="true"></i>
+            &asymp; <b id="chatBytes">0 B</b> this session
+          </span>
+          <span class="meter-spacer"></span>
+          <button type="button" id="chatHelpBtn">.help</button>
+          <button type="button" id="chatDisconnectBtn">disconnect</button>
         </div>
       </div>
-      <form class="chat-input-row" id="chatForm">
-        <span class="chat-prompt" aria-hidden="true">&gt;</span>
-        <label for="chatInput" class="visually-hidden">Chat message</label>
-        <input type="text" id="chatInput" maxlength="240" placeholder="Say something noodly…" autocomplete="off">
-        <span class="chat-count" id="chatCount" aria-hidden="true">240</span>
-        <button type="submit" class="btn btn-primary btn-chat-send">
-          <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-          <span class="visually-hidden">Send message</span>
-        </button>
-      </form>
     </div>
   </section>
 
@@ -3415,10 +3629,44 @@
 
 <!-- ---------- LIVE CHAT (Firebase Realtime Database) ---------- -->
 <script type="module">
+  /* =====================================================================
+     SLURP LOUNGE — anonymous chat zones, MXit-flavoured.
+
+     Design rules this module follows, and why:
+
+     1. ANONYMOUS FIRST. Firebase anonymous auth gives every browser a uid.
+        The uid is only ever used server-side (rules) to prove authorship and
+        to throttle; it is never shown and your visible handle is not derived
+        from it, so the name in the room reveals nothing about the account.
+        The handle is a throwaway "guest_xxxx" generated locally, and a
+        nickname is optional and lives only in localStorage.
+
+     2. NOTHING OPENS UNTIL ASKED. The Spark plan allows 100 concurrent RTDB
+        connections for the whole project, and one open tab with a listener
+        burns one for as long as it lives. So we connect on an explicit press,
+        and goOffline() when the tab has been hidden for a while.
+
+     3. EVERY LISTENER IS BOUNDED. Reads are limitToLast() queries, which the
+        security rules require (query.limitToLast <= 60). An unbounded read on
+        a long history is the single easiest way to burn the 10 GB/month
+        egress cap, so the rules refuse them outright.
+
+     4. WRITES ARE ATOMIC PAIRS. A message and the rate-limit ledger go up in
+        one multi-path update(). The rules only accept the message if the
+        merged tree shows a fresh rate stamp, which is what makes the
+        server-side flood limit unforgeable. See database.rules.json.
+
+     5. NO innerHTML FOR ANYTHING A STRANGER TYPED. Message bodies and
+        nicknames are built as DOM text nodes; emoticons become sibling
+        <span> elements. There is no string-concatenation path from a remote
+        payload into markup.
+     ===================================================================== */
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
   import {
-    getDatabase, ref, push, set, onValue, onChildAdded, onChildRemoved,
-    query, limitToLast, serverTimestamp, onDisconnect
+    getDatabase, ref, push, update, set, remove, get, onValue, onChildAdded,
+    onChildRemoved, query, limitToLast, serverTimestamp, onDisconnect,
+    goOffline, goOnline
   } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
   import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
@@ -3433,207 +3681,975 @@
     measurementId: "G-N1X7BNGPL8"
   };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const auth = getAuth(app);
+  /* ---------------------------------------------------------------- config */
 
-  const chatLog = document.getElementById('chatLog');
-  const chatStatus = document.getElementById('chatStatus');
-  const chatUserList = document.getElementById('chatUserList');
-  const chatUserCount = document.getElementById('chatUserCount');
-  const chatForm = document.getElementById('chatForm');
-  const chatInput = document.getElementById('chatInput');
-  const chatCount = document.getElementById('chatCount');
-  const chatJumpBtn = document.getElementById('chatJumpBtn');
+  const ZONES = ['lobby', 'ramen', 'pho', 'late-night', 'recs'];
+  const ZONE_RE = /^[a-z0-9][a-z0-9-]{1,23}$/;      // mirrors the rules regex
+  const ZONE_CAP = 7;                                // MXit capped zones near seven
+  const HISTORY = 50;                                // rules allow up to 60
+  const WHO_LIMIT = 80;
+  const MAX_LEN = 200;                               // rules cap x at 200
+  const MAX_NICK = 20;
+  const MAX_STATUS = 60;
+  const COOLDOWN_MS = 3400;                          // rules enforce 3000; leave headroom
+  const HIDDEN_GRACE_MS = 60000;
+  const IDLE_DISCONNECT_MS = 15 * 60 * 1000;
 
-  const SEND_COOLDOWN_MS = 2000;
-  const MAX_LEN = 240;
-  let lastSentAt = 0;
+  // The mood list MXit shipped in v5.1.0, plus one of ours.
+  const MOODS = [
+    { id: '',           label: 'no mood',    emoji: '' },
+    { id: 'happy',      label: 'happy',      emoji: '\u{1F60A}' },
+    { id: 'sad',        label: 'sad',        emoji: '\u{1F622}' },
+    { id: 'excited',    label: 'excited',    emoji: '\u{1F929}' },
+    { id: 'invincible', label: 'invincible', emoji: '\u{1F4AA}' },
+    { id: 'hot',        label: 'hot',        emoji: '\u{1F975}' },
+    { id: 'angry',      label: 'angry',      emoji: '\u{1F620}' },
+    { id: 'grumpy',     label: 'grumpy',     emoji: '\u{1F612}' },
+    { id: 'sick',       label: 'sick',       emoji: '\u{1F912}' },
+    { id: 'in_love',    label: 'in love',    emoji: '\u{1F60D}' },
+    { id: 'sleepy',     label: 'sleepy',     emoji: '\u{1F634}' },
+    { id: 'slurping',   label: 'slurping',   emoji: '\u{1F35C}' }
+  ];
+  const MOOD_BY_ID = Object.fromEntries(MOODS.map(m => [m.id, m]));
+
+  const EMOTICONS = {
+    ':)': '\u{1F642}', ':-)': '\u{1F642}', ':(': '\u{1F641}', ':-(': '\u{1F641}',
+    ':D': '\u{1F600}', ':-D': '\u{1F600}', ';)': '\u{1F609}', ';-)': '\u{1F609}',
+    ':P': '\u{1F61B}', ':-P': '\u{1F61B}', ':O': '\u{1F62E}', ':-O': '\u{1F62E}',
+    ':|': '\u{1F610}', ':/': '\u{1F615}', ":'(": '\u{1F622}', '8)': '\u{1F60E}',
+    'B)': '\u{1F60E}', 'xD': '\u{1F606}', 'XD': '\u{1F606}', '<3': '\u2764\uFE0F',
+    '</3': '\u{1F494}', ':*': '\u{1F618}', '(y)': '\u{1F44D}', '(n)': '\u{1F44E}',
+    'O:)': '\u{1F607}', '>:(': '\u{1F620}', ':@': '\u{1F620}', '^^': '\u{1F60A}',
+    '-_-': '\u{1F611}', ':S': '\u{1F616}', '(sun)': '\u2600\uFE0F',
+    '(star)': '\u2B50', '(ramen)': '\u{1F35C}', '(chop)': '\u{1F962}',
+    '(beer)': '\u{1F37A}', '(fire)': '\u{1F525}'
+  };
+  // Longest token first so ':-)' wins over ':)' and '</3' over '<3'.
+  const EMO_RE = new RegExp(
+    Object.keys(EMOTICONS)
+      .sort((a, b) => b.length - a.length)
+      .map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+      .join('|'),
+    'g'
+  );
+  const PICKER_EMO = [':)', ':(', ':D', ';)', ':P', ':O', '8)', 'xD', '<3', ':*',
+                      '(y)', '(n)', ':|', ':/', '-_-', 'O:)', '>:(', ':S',
+                      '(ramen)', '(chop)', '(fire)', '(star)', '(sun)', '(beer)'];
+
+  const NICK_KEY = 'slurpquest_chat_nick_v1';
+  const MOOD_KEY = 'slurpquest_chat_mood_v1';
+  const STATUS_KEY = 'slurpquest_chat_status_v1';
+  const IGNORE_KEY = 'slurpquest_chat_ignore_v1';
+  const AUTOJOIN_KEY = 'slurpquest_chat_autojoin_v1';
+  const HANDLE_KEY = 'slurpquest_chat_handle_v1';
+
+  /* ------------------------------------------------------------------- dom */
+
+  const $ = id => document.getElementById(id);
+  const chatGate = $('chatGate');
+  const chatLive = $('chatLive');
+  const chatLog = $('chatLog');
+  const chatStatus = $('chatStatus');
+  const chatUserList = $('chatUserList');
+  const chatUserCount = $('chatUserCount');
+  const chatForm = $('chatForm');
+  const chatInput = $('chatInput');
+  const chatCount = $('chatCount');
+  const chatJumpBtn = $('chatJumpBtn');
+  const chatZoneName = $('chatZoneName');
+  const zoneBar = $('zoneBar');
+  const chatMyNick = $('chatMyNick');
+  const chatMyDot = $('chatMyDot');
+  const chatMyMood = $('chatMyMood');
+  const chatAnonBadge = $('chatAnonBadge');
+  const chatBytes = $('chatBytes');
+  const moodBtn = $('moodBtn');
+  const moodPop = $('moodPop');
+  const moodGrid = $('moodGrid');
+  const emoBtn = $('emoBtn');
+  const emoPop = $('emoPop');
+  const emoGrid = $('emoGrid');
+
+  /* ----------------------------------------------------------------- state */
+
+  let app = null, db = null, auth = null;
   let uid = null;
+  let connected = false;
+  let zone = 'lobby';
+  let nick = '';                 // '' means anonymous
+  let anonHandle = 'guest';
+  let mood = '';
+  let status = '';
+  let ignoreList = [];
+  let bytes = 0;
+  let lastSentAt = 0;
+  let denials = 0;
+  let unsubs = [];               // teardown for the current zone's listeners
   let presenceRef = null;
-  let sawFirstMessage = false;
-  // onChildAdded replays every user already in the room, which used to spam
-  // "X has entered" on every page load. Only announce arrivals after the
-  // initial snapshot has landed.
-  let presenceReady = false;
+  let whoMap = new Map();        // uid -> presence, for local join/leave/mood diffing
+  let whoSeeded = false;
+  let zoneCounts = new Map();
+  let hiddenTimer = null, idleTimer = null;
+  let socketOpen = false;
 
-  function currentTraveler(){
-    return window.__slurpTraveler || { id:'guest', name:'Traveler', color:'#9aa0ad' };
+  /* ------------------------------------------------------------- utilities */
+
+  function readLS(key, fallback){
+    try { const v = localStorage.getItem(key); return v === null ? fallback : v; }
+    catch(_){ return fallback; }
+  }
+  function writeLS(key, val){
+    try { if(val === null) localStorage.removeItem(key); else localStorage.setItem(key, val); }
+    catch(_){ /* private mode: chat still works, preferences just will not stick */ }
   }
 
-  function escapeHtml(str){
-    return String(str).replace(/[&<>"']/g, s => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
+  // Generated locally and never from the uid, so the handle leaks nothing about
+  // the auth account. Persisted only so regulars stay recognisable between visits.
+  function newHandleSuffix(){
+    const buf = new Uint8Array(2);
+    (window.crypto || {}).getRandomValues
+      ? window.crypto.getRandomValues(buf)
+      : (buf[0] = Math.random() * 256, buf[1] = Math.random() * 256);
+    return Array.from(buf).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  function loadHandle(){
+    let suffix = readLS(HANDLE_KEY, '');
+    if(!/^[0-9a-f]{4}$/.test(suffix)){
+      suffix = newHandleSuffix();
+      writeLS(HANDLE_KEY, suffix);
+    }
+    anonHandle = 'guest_' + suffix;
+  }
+
+  function currentTraveler(){
+    return window.__slurpTraveler || { id: 'guest', name: '', color: '#9aa0ad' };
+  }
+  function myColor(){
+    const c = currentTraveler().color;
+    return /^#[0-9a-fA-F]{6}$/.test(c || '') ? c : '#9aa0ad';
+  }
+  function myName(){
+    return nick || anonHandle;
+  }
+  function toast(msg, opts){
+    if(typeof window.__slurpToast === 'function') window.__slurpToast(msg, opts);
   }
 
   function fmtTime(ts){
     const d = ts ? new Date(ts) : new Date();
-    return d.toTimeString().slice(0,5);
+    return d.toTimeString().slice(0, 5);
   }
+  function fmtBytes(n){
+    if(n < 1024) return n + ' B';
+    if(n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+    return (n / (1024 * 1024)).toFixed(2) + ' MB';
+  }
+  // Approximate: JSON payload only, no websocket/TLS framing. Honest about that
+  // in the tooltip. MXit's whole pitch was cheap data, so it belongs on screen.
+  function meter(payload){
+    try { bytes += JSON.stringify(payload).length; } catch(_){ }
+    chatBytes.textContent = fmtBytes(bytes);
+  }
+
+  function cleanNick(raw){
+    return String(raw || '')
+      .replace(/[\u0000-\u001f\u007f-\u009f]/g, '')  // control chars
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, MAX_NICK);
+  }
+  function cleanText(raw){
+    return String(raw || '')
+      .replace(/[\u0000-\u001f\u007f-\u009f]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, MAX_LEN);
+  }
+
+  /* --------------------------------------------------- safe text rendering */
+
+  // Appends `text` to `parent` as text nodes, swapping emoticon tokens for
+  // <span class="emo"> siblings. Nothing here touches innerHTML, so a remote
+  // payload cannot become markup no matter what it contains.
+  function appendText(parent, text){
+    const src = String(text == null ? '' : text);
+    let last = 0;
+    EMO_RE.lastIndex = 0;
+    let m;
+    while((m = EMO_RE.exec(src)) !== null){
+      if(m.index > last) parent.appendChild(document.createTextNode(src.slice(last, m.index)));
+      const span = document.createElement('span');
+      span.className = 'emo';
+      span.textContent = EMOTICONS[m[0]];
+      span.title = m[0];
+      parent.appendChild(span);
+      last = m.index + m[0].length;
+    }
+    if(last < src.length) parent.appendChild(document.createTextNode(src.slice(last)));
+  }
+
+  /* ------------------------------------------------------------- chat log */
 
   function isPinnedToBottom(){
     return chatLog.scrollHeight - chatLog.scrollTop - chatLog.clientHeight < 48;
   }
-
-  /* Never yank the scroll position out from under someone reading history. */
-  function appendLine(node){
-    const pinned = isPinnedToBottom();
-    chatLog.appendChild(node);
-    if(pinned){
+  function afterAppend(){
+    if(isPinnedToBottom()){
       chatLog.scrollTop = chatLog.scrollHeight;
       chatJumpBtn.classList.remove('show');
     } else {
       chatJumpBtn.classList.add('show');
     }
+    while(chatLog.childElementCount > 200) chatLog.removeChild(chatLog.firstChild);
   }
 
-  function appendMessage(msg){
-    const mine = msg.travelerId && msg.travelerId === currentTraveler().id;
-    const line = document.createElement('div');
-    line.className = 'chat-line' + (mine ? ' mine' : '');
-    line.innerHTML =
-      `<span class="ts">[${escapeHtml(fmtTime(msg.ts))}]</span>` +
-      `<span class="who" style="color:${escapeHtml(msg.color || '#aab1be')}">${escapeHtml(msg.name || 'Traveler')}:</span>` +
-      `<span class="txt">${escapeHtml(msg.text || '')}</span>`;
-    appendLine(line);
-    sawFirstMessage = true;
+  function sysLine(text, cls){
+    const div = document.createElement('div');
+    div.className = 'chat-line system' + (cls ? ' ' + cls : '');
+    appendText(div, text);
+    chatLog.appendChild(div);
+    afterAppend();
+    return div;
   }
 
-  function appendSystem(text, cls){
-    const line = document.createElement('div');
-    line.className = 'chat-line ' + (cls || 'system');
-    line.textContent = `*** ${text}`;
-    appendLine(line);
+  function msgLine(key, m){
+    const name = cleanNick(m.n) || 'guest';
+    if(isIgnored(name)) return;
+
+    const div = document.createElement('div');
+    div.className = 'chat-line';
+    if(key) div.dataset.key = key;
+
+    const time = document.createElement('span');
+    time.className = 'ts';
+    time.textContent = '[' + fmtTime(m.t) + ']';
+    div.appendChild(time);
+    div.appendChild(document.createTextNode(' '));
+
+    const moodDef = MOOD_BY_ID[m.m || ''];
+    if(moodDef && moodDef.emoji){
+      const mt = document.createElement('span');
+      mt.className = 'mood-tag';
+      mt.textContent = moodDef.emoji;
+      mt.title = moodDef.label;
+      div.appendChild(mt);
+    }
+
+    if(m.k === 'me'){
+      div.classList.add('action');
+      const who = document.createElement('span');
+      who.textContent = '* ' + name + ' ';
+      div.appendChild(who);
+      appendText(div, cleanText(m.x));
+    } else if(m.k === 'buzz'){
+      div.classList.add('buzz');
+      const who = document.createElement('span');
+      who.textContent = '>>> ' + name + ' buzzed the zone';
+      div.appendChild(who);
+      if(!prefersReducedMotion()) navigatorVibrate();
+    } else {
+      const who = document.createElement('span');
+      who.className = 'who';
+      who.style.color = /^#[0-9a-fA-F]{6}$/.test(m.c || '') ? m.c : '#9aa0ad';
+      who.textContent = name;
+      div.appendChild(who);
+      div.appendChild(document.createTextNode(': '));
+      appendText(div, cleanText(m.x));
+    }
+
+    if(m.u && m.u === uid) div.classList.add('mine');
+    chatLog.appendChild(div);
+    afterAppend();
   }
 
-  function setStatus(text, cls){
-    chatStatus.textContent = text;
-    chatStatus.className = 'chat-status' + (cls ? ' ' + cls : '');
+  function prefersReducedMotion(){
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+  function navigatorVibrate(){
+    try { if(navigator.vibrate) navigator.vibrate(120); } catch(_){ }
   }
 
-  function renderUserList(usersObj){
-    const users = Object.values(usersObj || {});
-    chatUserCount.textContent = users.length;
-    chatUserList.innerHTML = users.length
-      ? users.map(u =>
-          `<li><span class="t-dot" style="background:${escapeHtml(u.color || '#aab1be')};color:${escapeHtml(u.color || '#aab1be')};"></span>${escapeHtml(u.name || 'Traveler')}</li>`
-        ).join('')
-      : '<li style="color:var(--steel)">Nobody yet</li>';
+  /* --------------------------------------------------------- ignore (local) */
+
+  function loadIgnore(){
+    try {
+      const arr = JSON.parse(readLS(IGNORE_KEY, '[]'));
+      ignoreList = Array.isArray(arr) ? arr.filter(s => typeof s === 'string').slice(0, 100) : [];
+    } catch(_){ ignoreList = []; }
   }
+  function saveIgnore(){ writeLS(IGNORE_KEY, JSON.stringify(ignoreList)); }
+  function isIgnored(name){ return ignoreList.includes(String(name).toLowerCase()); }
 
-  chatJumpBtn.addEventListener('click', function(){
-    chatLog.scrollTop = chatLog.scrollHeight;
-    chatJumpBtn.classList.remove('show');
-    chatLog.focus();
-  });
-  chatLog.addEventListener('scroll', function(){
-    if(isPinnedToBottom()) chatJumpBtn.classList.remove('show');
-  }, { passive:true });
+  /* ------------------------------------------------------------- identity */
 
-  chatInput.addEventListener('input', function(){
-    const left = MAX_LEN - chatInput.value.length;
-    chatCount.textContent = left;
-    chatCount.classList.toggle('warn', left <= 20);
-  });
-
-  appendSystem('connecting to the slurp lounge…');
-
-  signInAnonymously(auth).catch(function(err){
-    console.warn('Chat auth failed', err);
-    setStatus('offline', 'offline');
-    appendSystem('chat is offline — the map and your passport still work fine.', 'notice');
-    chatInput.disabled = true;
-    chatInput.placeholder = 'Chat unavailable';
-  });
-
-  onAuthStateChanged(auth, function(user){
-    if(!user) return;
-    uid = user.uid;
-    setupPresence();
-    setupMessages();
-  });
-
-  function setupPresence(){
-    presenceRef = ref(db, 'presence/' + uid);
-    const t = currentTraveler();
-
-    onValue(ref(db, '.info/connected'), function(snap){
-      if(snap.val() === true){
-        onDisconnect(presenceRef).remove();
-        set(presenceRef, { name: t.name, color: t.color, travelerId: t.id, ts: serverTimestamp() });
-        setStatus('online', 'online');
-      } else {
-        setStatus('reconnecting…', 'offline');
-      }
-    });
-
-    window.addEventListener('slurp:travelerRenamed', function(e){
-      const updated = e.detail || currentTraveler();
-      if(presenceRef){
-        set(presenceRef, { name: updated.name, color: updated.color, travelerId: updated.id, ts: serverTimestamp() });
-      }
-    });
-
-    const allPresenceRef = ref(db, 'presence');
-    onValue(allPresenceRef, function(snap){
-      renderUserList(snap.val() || {});
-      if(!presenceReady){
-        // Let the replayed onChildAdded burst finish before announcing arrivals.
-        setTimeout(() => { presenceReady = true; }, 400);
-      }
-    });
-    onChildAdded(allPresenceRef, function(snap){
-      if(!presenceReady) return;
-      const u = snap.val();
-      if(u && snap.key !== uid) appendSystem(`${u.name} has entered the noodle house`);
-    });
-    onChildRemoved(allPresenceRef, function(snap){
-      if(!presenceReady) return;
-      const u = snap.val();
-      if(u) appendSystem(`${u.name} has slurped their last and left`);
+  function refreshIdentity(){
+    chatMyNick.textContent = myName();
+    chatMyDot.style.background = myColor();
+    const md = MOOD_BY_ID[mood] || MOOD_BY_ID[''];
+    chatMyMood.textContent = md && md.emoji ? md.emoji : '';
+    chatMyMood.title = md ? md.label : '';
+    chatAnonBadge.textContent = nick ? 'nickname' : 'anonymous';
+    chatAnonBadge.title = nick
+      ? 'Your nickname is stored only in this browser. Clear site data and it is gone.'
+      : 'A throwaway handle. Nobody can tell who you are.';
+    Array.from(moodGrid.children).forEach(b => {
+      b.setAttribute('aria-checked', String(b.dataset.mood === mood));
     });
   }
 
-  function setupMessages(){
-    const msgQuery = query(ref(db, 'chatMessages'), limitToLast(100));
-    onChildAdded(msgQuery, function(snap){
-      appendMessage(snap.val());
-    });
-    onValue(msgQuery, function(){
-      if(!sawFirstMessage) appendSystem('no messages yet — say hello.');
-    }, { onlyOnce:true });
+  function setNick(raw){
+    const clean = cleanNick(raw);
+    if(!clean){
+      nick = '';
+      writeLS(NICK_KEY, null);
+      sysLine('You are anonymous again — showing as ' + anonHandle + '.');
+    } else if(/^guest[_-]/i.test(clean)){
+      sysLine('The guest_ prefix is reserved for anonymous handles. Pick something else.');
+      return;
+    } else {
+      nick = clean;
+      writeLS(NICK_KEY, nick);
+      sysLine('You are now known as ' + nick + '.');
+    }
+    refreshIdentity();
+    if(connected) writePresence();
   }
 
-  chatForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    const text = chatInput.value.trim();
-    if(!text) return;
-
-    const now = Date.now();
-    if(now - lastSentAt < SEND_COOLDOWN_MS){
-      const wait = Math.ceil((SEND_COOLDOWN_MS - (now - lastSentAt)) / 1000);
-      appendSystem(`slow down, noodle enthusiast — ${wait}s before your next message`, 'notice');
+  function setMood(id, announce){
+    if(!(id in MOOD_BY_ID)){
+      sysLine('Unknown mood. Try: ' + MOODS.filter(m => m.id).map(m => m.id).join(', '));
       return;
     }
-    lastSentAt = now;
+    mood = id;
+    writeLS(MOOD_KEY, mood || null);
+    refreshIdentity();
+    if(connected) writePresence();
+    if(announce !== false){
+      const md = MOOD_BY_ID[mood];
+      sysLine(mood ? (myName() + ' is now ' + md.label + ' ' + md.emoji)
+                   : (myName() + ' cleared their mood'));
+    }
+  }
 
-    const t = currentTraveler();
-    push(ref(db, 'chatMessages'), {
-      name: t.name,
-      color: t.color,
-      travelerId: t.id,
-      text: text.slice(0, MAX_LEN),
-      ts: Date.now()
-    }).catch(function(){
-      appendSystem('message failed to send — check your connection.', 'notice');
-      if(window.__slurpToast) window.__slurpToast('Chat message failed to send.', { kind:'error', icon:'fa-triangle-exclamation' });
+  function setStatus(raw){
+    status = cleanText(raw).slice(0, MAX_STATUS);
+    writeLS(STATUS_KEY, status || null);
+    sysLine(status ? ('Status set: ' + status) : 'Status cleared.');
+    if(connected) writePresence();
+  }
+
+  /* ------------------------------------------------------------ connection */
+
+  function setStatusText(text, online){
+    chatStatus.textContent = text;
+    chatStatus.classList.toggle('online', !!online);
+    chatStatus.classList.toggle('offline', !online);
+  }
+
+  async function connect(){
+    if(connected) return;
+    connected = true;
+    chatGate.hidden = true;
+    chatLive.hidden = false;
+    writeLS(AUTOJOIN_KEY, '1');
+    setStatusText('connecting\u2026', false);
+
+    try {
+      if(!app){
+        app = initializeApp(firebaseConfig);
+        db = getDatabase(app);
+        auth = getAuth(app);
+      }
+      if(!socketOpen){ goOnline(db); socketOpen = true; }
+      await signInAnonymously(auth);
+    } catch(err){
+      setStatusText('offline', false);
+      sysLine('Could not reach the lounge (' + (err && err.code ? err.code : 'network') + '). Everything else on this page still works.');
+      connected = false;
+      chatGate.hidden = false;
+      chatLive.hidden = true;
+      return;
+    }
+
+    onAuthStateChanged(auth, user => {
+      if(!user || !connected) return;
+      const fresh = uid !== user.uid;
+      uid = user.uid;
+      refreshIdentity();
+      if(fresh){
+        sysLine('Connected anonymously as ' + myName() + '. Type .help for commands.');
+        joinZone(zone, true);
+      }
     });
+
+    resetIdleTimer();
+  }
+
+  function disconnect(userAsked){
+    if(!connected) return;
+    leaveZone();
+    connected = false;
+    whoSeeded = false;
+    if(socketOpen && db){ goOffline(db); socketOpen = false; }
+    setStatusText('offline', false);
+    chatLive.hidden = true;
+    chatGate.hidden = false;
+    if(userAsked){
+      writeLS(AUTOJOIN_KEY, null);
+      toast('Left the lounge. Your nickname is remembered on this device.');
+    }
+    clearTimeout(idleTimer);
+  }
+
+  function resetIdleTimer(){
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(() => {
+      if(!connected) return;
+      sysLine('Disconnected after 15 minutes idle to free up a connection slot. Press connect to rejoin.');
+      disconnect(false);
+    }, IDLE_DISCONNECT_MS);
+  }
+
+  /* ------------------------------------------------------------------ zones */
+
+  function renderZoneBar(){
+    zoneBar.replaceChildren();
+    ZONES.concat(ZONES.includes(zone) ? [] : [zone]).forEach(z => {
+      const tab = document.createElement('button');
+      tab.type = 'button';
+      tab.className = 'zone-tab';
+      tab.role = 'tab';
+      tab.setAttribute('aria-selected', String(z === zone));
+      tab.dataset.zone = z;
+
+      const label = document.createElement('span');
+      label.textContent = '#' + z;
+      tab.appendChild(label);
+
+      const n = zoneCounts.get(z);
+      if(typeof n === 'number' && n > 0){
+        const pop = document.createElement('span');
+        pop.className = 'zone-pop';
+        pop.textContent = n + '/' + ZONE_CAP;
+        tab.appendChild(pop);
+        if(n >= ZONE_CAP) tab.classList.add('full');
+      }
+      tab.addEventListener('click', () => joinZone(z));
+      zoneBar.appendChild(tab);
+    });
+  }
+
+  async function refreshZoneCounts(){
+    if(!db || !connected) return;
+    await Promise.all(ZONES.map(async z => {
+      try {
+        const snap = await get(query(ref(db, 'who/' + z), limitToLast(WHO_LIMIT)));
+        const val = snap.val() || {};
+        meter(val);
+        zoneCounts.set(z, Object.keys(val).length);
+      } catch(_){ /* rules may deny before deploy; counts are cosmetic */ }
+    }));
+    renderZoneBar();
+  }
+
+  function leaveZone(){
+    unsubs.forEach(fn => { try { fn(); } catch(_){ } });
+    unsubs = [];
+    if(presenceRef){
+      try { onDisconnect(presenceRef).cancel(); } catch(_){ }
+      try { remove(presenceRef); } catch(_){ }
+      presenceRef = null;
+    }
+    whoMap = new Map();
+    whoSeeded = false;
+  }
+
+  function writePresence(){
+    if(!db || !uid || !presenceRef) return;
+    const payload = { n: myName(), c: myColor(), t: serverTimestamp() };
+    if(mood) payload.m = mood;
+    if(status) payload.s = status;
+    meter(payload);
+    set(presenceRef, payload).catch(() => { /* rules may reject; presence is best effort */ });
+  }
+
+  function joinZone(z, initial){
+    const target = String(z || '').toLowerCase();
+    if(!ZONE_RE.test(target)){
+      sysLine('Zone names are 2-24 characters, lowercase letters, digits and dashes.');
+      return;
+    }
+    if(!initial && target === zone){ sysLine('You are already in #' + zone + '.'); return; }
+    if(!db || !uid) return;
+
+    leaveZone();
+    zone = target;
+    chatZoneName.textContent = '#' + zone;
+    chatLog.replaceChildren();
+    renderZoneBar();
+    setStatusText('online \u2014 #' + zone, true);
+    sysLine('\u2014 you joined #' + zone + ' \u2014');
+
+    presenceRef = ref(db, 'who/' + zone + '/' + uid);
+    onDisconnect(presenceRef).remove();
+    writePresence();
+
+    // Bounded query: the security rules reject any read without limitToLast.
+    const msgQ = query(ref(db, 'msg/' + zone), limitToLast(HISTORY));
+    unsubs.push(onChildAdded(msgQ, snap => {
+      const v = snap.val();
+      if(!v || typeof v !== 'object') return;
+      meter(v);
+      msgLine(snap.key, v);
+    }, () => {
+      setStatusText('read denied', false);
+      sysLine('The database refused to send messages. Deploy database.rules.json — see CHAT-SETUP.md.');
+    }));
+
+    // A rejected write is rolled back locally, which arrives here as a removal.
+    unsubs.push(onChildRemoved(msgQ, snap => {
+      const el = chatLog.querySelector('[data-key="' + CSS.escape(snap.key) + '"]');
+      if(el) el.remove();
+    }));
+
+    // One listener for presence, diffed locally, so joins/leaves/mood changes
+    // cost nothing extra and the initial snapshot never spams the log.
+    const whoQ = query(ref(db, 'who/' + zone), limitToLast(WHO_LIMIT));
+    unsubs.push(onValue(whoQ, snap => {
+      const val = snap.val() || {};
+      meter(val);
+      diffWho(val);
+      renderWho(val);
+      zoneCounts.set(zone, Object.keys(val).length);
+      renderZoneBar();
+    }, () => {
+      sysLine('Presence unavailable — rules may not be deployed yet.');
+    }));
+
+    refreshZoneCounts();
+    resetIdleTimer();
+  }
+
+  function diffWho(val){
+    const next = new Map(Object.entries(val));
+    if(!whoSeeded){
+      whoMap = next;
+      whoSeeded = true;
+      const others = Array.from(next.keys()).filter(k => k !== uid).length;
+      if(others === 0) sysLine('Nobody else here yet. Leave a message and check back.');
+      return;
+    }
+    next.forEach((v, k) => {
+      if(k === uid) return;
+      const before = whoMap.get(k);
+      const name = cleanNick(v && v.n) || 'guest';
+      if(isIgnored(name)) return;
+      if(!before){
+        sysLine('*** ' + name + ' has entered #' + zone);
+      } else if((before.m || '') !== (v.m || '')){
+        // MXit announced mood changes right in the conversation: "alias is now happy".
+        const md = MOOD_BY_ID[v.m || ''];
+        sysLine(md && md.id ? ('*** ' + name + ' is now ' + md.label + ' ' + md.emoji)
+                            : ('*** ' + name + ' cleared their mood'));
+      }
+    });
+    whoMap.forEach((v, k) => {
+      if(k === uid || next.has(k)) return;
+      const name = cleanNick(v && v.n) || 'guest';
+      if(!isIgnored(name)) sysLine('*** ' + name + ' has left #' + zone);
+    });
+    whoMap = next;
+  }
+
+  function renderWho(val){
+    const entries = Object.entries(val);
+    chatUserCount.textContent = String(entries.length);
+    chatUserList.replaceChildren();
+    entries
+      .sort((a, b) => (a[1] && a[1].n || '').localeCompare(b[1] && b[1].n || ''))
+      .forEach(([k, v]) => {
+        const name = cleanNick(v && v.n) || 'guest';
+        const li = document.createElement('li');
+        if(isIgnored(name)) li.classList.add('ignored');
+
+        const dot = document.createElement('span');
+        dot.className = 't-dot';
+        dot.style.background = /^#[0-9a-fA-F]{6}$/.test(v && v.c || '') ? v.c : '#9aa0ad';
+        li.appendChild(dot);
+
+        const label = document.createElement('span');
+        label.textContent = name + (k === uid ? ' (you)' : '');
+        li.appendChild(label);
+
+        const md = MOOD_BY_ID[(v && v.m) || ''];
+        if(md && md.emoji){
+          const mt = document.createElement('span');
+          mt.className = 'mood-tag';
+          mt.textContent = md.emoji;
+          mt.title = md.label;
+          li.appendChild(mt);
+        }
+        if(v && v.s){
+          const st = document.createElement('span');
+          st.className = 'u-status';
+          appendText(st, cleanText(v.s));
+          li.appendChild(st);
+        }
+        chatUserList.appendChild(li);
+      });
+  }
+
+  /* ------------------------------------------------------------- sending */
+
+  async function sendMessage(text, kind){
+    const body = cleanText(text);
+    if(!body || !db || !uid) return;
+
+    const wait = COOLDOWN_MS - (Date.now() - lastSentAt);
+    if(wait > 0){
+      sysLine('Easy — one message every ' + (COOLDOWN_MS / 1000).toFixed(1) + 's. Try again in ' + Math.ceil(wait / 1000) + 's.');
+      return;
+    }
+    lastSentAt = Date.now();
+
+    const id = push(ref(db, 'msg/' + zone)).key;   // key is generated locally, no round trip
+    const ts = serverTimestamp();
+    const payload = { u: uid, n: myName(), c: myColor(), x: body, t: ts };
+    if(mood) payload.m = mood;
+    if(kind) payload.k = kind;
+
+    // Message + rate ledger in ONE atomic multi-path update. The rules require
+    // the merged tree to show a fresh rate stamp, so a client cannot post
+    // without also advancing its own cooldown.
+    const patch = {};
+    patch['msg/' + zone + '/' + id] = payload;
+    patch['rate/' + uid] = ts;
+    meter(patch);
+
+    try {
+      await update(ref(db), patch);
+      denials = 0;
+    } catch(err){
+      lastSentAt = 0;
+      const code = String((err && err.message) || err);
+      if(/permission|denied/i.test(code)){
+        denials++;
+        if(denials >= 3){
+          sysLine('Writes keep being refused. Check that database.rules.json is deployed and matches this client — see CHAT-SETUP.md.');
+        } else {
+          sysLine('Message refused: you may be posting too fast, banned, or the lounge is closed.');
+        }
+      } else {
+        sysLine('Message did not send (' + code + ').');
+      }
+    }
+  }
+
+  /* ------------------------------------------------------- dot commands */
+
+  const HELP = [
+    '.nick <name>      set a nickname (blank to go anonymous)',
+    '.anon             drop the nickname, back to a guest handle',
+    '.mood <mood>      set your mood, or .mood to list them',
+    '.status <text>    set a personal message',
+    '.me <action>      speak in the third person',
+    '.buzz             buzz everyone in the zone',
+    '.join <zone>      hop to another chat zone',
+    '.zones            list the zones',
+    '.who              who is in this zone',
+    '.ignore <nick>    hide a person, on this device only',
+    '.unignore <nick>  unhide them',
+    '.rat <nick>       report and hide someone',
+    '.newid            burn this guest handle, get a fresh one',
+    '.bytes            how much data this session has used',
+    '.clear            wipe your local view',
+    '.help             this list'
+  ];
+
+  function runCommand(raw){
+    const m = raw.match(/^[./](\S*)\s*([\s\S]*)$/);
+    if(!m) return false;
+    const cmd = m[1].toLowerCase();
+    const arg = m[2].trim();
+
+    switch(cmd){
+      case 'help': case 'h': case '?':
+        sysLine('Commands (MXit used dots, so both . and / work):');
+        HELP.forEach(l => sysLine('  ' + l));
+        return true;
+
+      case 'nick': setNick(arg); return true;
+      case 'anon': setNick(''); return true;
+
+      case 'mood':
+        if(!arg){
+          sysLine('Moods: ' + MOODS.filter(x => x.id).map(x => x.id + ' ' + x.emoji).join('  '));
+          sysLine('Use .mood happy, or .mood none to clear.');
+        } else {
+          setMood(arg.toLowerCase() === 'none' ? '' : arg.toLowerCase().replace(/[\s-]+/g, '_'));
+        }
+        return true;
+
+      case 'status': setStatus(arg); return true;
+
+      case 'me':
+        if(!arg) sysLine('Usage: .me slurps loudly');
+        else sendMessage(arg, 'me');
+        return true;
+
+      case 'buzz':
+        sendMessage('buzz', 'buzz');
+        return true;
+
+      case 'join': case 'j':
+        if(!arg) sysLine('Usage: .join ramen');
+        else {
+          const target = arg.toLowerCase();
+          const n = zoneCounts.get(target);
+          if(typeof n === 'number' && n >= ZONE_CAP){
+            sysLine('#' + target + ' is full (' + n + '/' + ZONE_CAP + '). Joining anyway — or try #' + target + '2.');
+          }
+          joinZone(target);
+        }
+        return true;
+
+      case 'zones': case 'list':
+        sysLine('Zones: ' + ZONES.map(z => {
+          const n = zoneCounts.get(z);
+          return '#' + z + (typeof n === 'number' ? ' (' + n + ')' : '');
+        }).join('  '));
+        sysLine('Make your own with .join <name> — anything lowercase works.');
+        return true;
+
+      case 'who':
+        if(!whoMap.size){ sysLine('Nobody listed yet.'); return true; }
+        sysLine('In #' + zone + ':');
+        whoMap.forEach((v, k) => {
+          const md = MOOD_BY_ID[(v && v.m) || ''];
+          sysLine('  ' + (cleanNick(v && v.n) || 'guest') +
+                  (k === uid ? ' (you)' : '') +
+                  (md && md.emoji ? ' ' + md.emoji : '') +
+                  (v && v.s ? ' \u2014 ' + cleanText(v.s) : ''));
+        });
+        return true;
+
+      case 'ignore':
+        if(!arg){ sysLine(ignoreList.length ? 'Ignoring: ' + ignoreList.join(', ') : 'You are not ignoring anyone.'); return true; }
+        {
+          const key = cleanNick(arg).toLowerCase();
+          if(key && !ignoreList.includes(key)){ ignoreList.push(key); saveIgnore(); }
+          sysLine('Ignoring ' + key + '. This is local to your browser — nobody is told.');
+          renderWho(Object.fromEntries(whoMap));
+        }
+        return true;
+
+      case 'unignore':
+        {
+          const key = cleanNick(arg).toLowerCase();
+          ignoreList = ignoreList.filter(x => x !== key);
+          saveIgnore();
+          sysLine('No longer ignoring ' + key + '.');
+          renderWho(Object.fromEntries(whoMap));
+        }
+        return true;
+
+      case 'rat':
+        if(!arg){ sysLine('Usage: .rat <nick>'); return true; }
+        {
+          const key = cleanNick(arg).toLowerCase();
+          if(key && !ignoreList.includes(key)){ ignoreList.push(key); saveIgnore(); }
+          renderWho(Object.fromEntries(whoMap));
+          sysLine('Reported and hidden. Honest warning: there is no moderator on duty here, so .rat only mutes them for you.');
+        }
+        return true;
+
+      case 'asl':
+        // Deliberately not implemented. MXit's .asl is exactly the habit every
+        // safety guide of that era warned about, and this room is anonymous by
+        // design. Personal messages cover the nostalgia without the risk.
+        sysLine('.asl is retired. This lounge is anonymous on purpose — use .status if you want to say something about yourself.');
+        return true;
+
+      case 'newid':
+        writeLS(HANDLE_KEY, null);
+        loadHandle();
+        refreshIdentity();
+        if(connected) writePresence();
+        sysLine(nick ? ('New guest handle: ' + anonHandle + '. Your nickname ' + nick + ' is still showing — .anon to hide behind the handle.')
+                     : ('You are now ' + anonHandle + '.'));
+        return true;
+
+      case 'bytes':
+        sysLine('About ' + fmtBytes(bytes) + ' of payload this session (JSON only, no protocol overhead).');
+        return true;
+
+      case 'clear':
+        chatLog.replaceChildren();
+        sysLine('Local view cleared. Everyone else still has the history.');
+        return true;
+
+      default:
+        sysLine('Unknown command "' + raw.slice(0, 24) + '". Try .help');
+        return true;
+    }
+  }
+
+  /* -------------------------------------------------------------- pickers */
+
+  function buildMoodGrid(){
+    moodGrid.replaceChildren();
+    MOODS.forEach(m => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mood-btn';
+      b.role = 'radio';
+      b.dataset.mood = m.id;
+      b.setAttribute('aria-checked', String(m.id === mood));
+      const e = document.createElement('span');
+      e.textContent = m.emoji || '\u2014';
+      e.setAttribute('aria-hidden', 'true');
+      b.appendChild(e);
+      b.appendChild(document.createTextNode(m.label));
+      b.addEventListener('click', () => { setMood(m.id); closePickers(); });
+      moodGrid.appendChild(b);
+    });
+  }
+
+  function buildEmoGrid(){
+    emoGrid.replaceChildren();
+    PICKER_EMO.forEach(tok => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'emo-btn';
+      b.textContent = EMOTICONS[tok];
+      b.title = tok;
+      b.setAttribute('aria-label', 'Insert ' + tok);
+      b.addEventListener('click', () => { insertToken(tok); closePickers(); });
+      emoGrid.appendChild(b);
+    });
+  }
+
+  function insertToken(tok){
+    const start = chatInput.selectionStart ?? chatInput.value.length;
+    const end = chatInput.selectionEnd ?? chatInput.value.length;
+    const before = chatInput.value.slice(0, start);
+    const after = chatInput.value.slice(end);
+    const pad = before && !/\s$/.test(before) ? ' ' : '';
+    chatInput.value = (before + pad + tok + ' ' + after).slice(0, MAX_LEN);
+    const caret = Math.min((before + pad + tok + ' ').length, MAX_LEN);
+    chatInput.setSelectionRange(caret, caret);
+    chatInput.focus();
+    updateCount();
+  }
+
+  function closePickers(){
+    [[moodBtn, moodPop], [emoBtn, emoPop]].forEach(([btn, pop]) => {
+      pop.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  }
+  function togglePicker(btn, pop){
+    const willOpen = !pop.classList.contains('open');
+    closePickers();
+    if(willOpen){
+      pop.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+      const first = pop.querySelector('button');
+      if(first) first.focus();
+    }
+  }
+
+  /* --------------------------------------------------------------- events */
+
+  function updateCount(){
+    const left = MAX_LEN - chatInput.value.length;
+    chatCount.textContent = String(left);
+    chatCount.classList.toggle('warn', left <= 24);
+  }
+
+  $('chatConnectBtn').addEventListener('click', connect);
+  $('chatDisconnectBtn').addEventListener('click', () => disconnect(true));
+  $('chatHelpBtn').addEventListener('click', () => { runCommand('.help'); chatInput.focus(); });
+
+  $('chatNickBtn').addEventListener('click', () => {
+    chatInput.value = nick ? '.nick ' + nick : '.nick ';
+    chatInput.focus();
+    chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+    updateCount();
+    sysLine(nick ? 'Editing your nickname. Send .nick with nothing after it to go anonymous.'
+                 : 'Type a nickname after .nick and press enter. Leave it blank to stay anonymous.');
+  });
+
+  moodBtn.addEventListener('click', () => togglePicker(moodBtn, moodPop));
+  emoBtn.addEventListener('click', () => togglePicker(emoBtn, emoPop));
+
+  document.addEventListener('click', e => {
+    if(moodPop.classList.contains('open') || emoPop.classList.contains('open')){
+      if(!e.target.closest('.icon-slot')) closePickers();
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape' && (moodPop.classList.contains('open') || emoPop.classList.contains('open'))){
+      e.stopPropagation();
+      closePickers();
+      chatInput.focus();
+    }
+  });
+
+  chatInput.addEventListener('input', () => { updateCount(); resetIdleTimer(); });
+
+  chatForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const raw = chatInput.value.trim();
+    if(!raw) return;
     chatInput.value = '';
-    chatCount.textContent = MAX_LEN;
-    chatCount.classList.remove('warn');
-    // Sending is an explicit intent to be at the bottom.
+    updateCount();
+    resetIdleTimer();
+    if(/^[./]/.test(raw)) runCommand(raw);
+    else sendMessage(raw, null);
+  });
+
+  chatLog.addEventListener('scroll', () => {
+    chatJumpBtn.classList.toggle('show', !isPinnedToBottom());
+  });
+  chatJumpBtn.addEventListener('click', () => {
     chatLog.scrollTop = chatLog.scrollHeight;
     chatJumpBtn.classList.remove('show');
   });
+
+  // Free the connection slot when the tab is parked, reclaim it on return.
+  document.addEventListener('visibilitychange', () => {
+    if(!connected || !db) return;
+    if(document.hidden){
+      hiddenTimer = setTimeout(() => {
+        if(document.hidden && socketOpen){ goOffline(db); socketOpen = false; setStatusText('paused', false); }
+      }, HIDDEN_GRACE_MS);
+    } else {
+      clearTimeout(hiddenTimer);
+      if(!socketOpen){ goOnline(db); socketOpen = true; setStatusText('online \u2014 #' + zone, true); }
+      resetIdleTimer();
+    }
+  });
+
+  window.addEventListener('pagehide', () => { if(presenceRef) try { remove(presenceRef); } catch(_){ } });
+
+  /* ----------------------------------------------------------------- boot */
+
+  loadIgnore();
+  loadHandle();
+  nick = cleanNick(readLS(NICK_KEY, ''));
+  mood = readLS(MOOD_KEY, '') || '';
+  if(!(mood in MOOD_BY_ID)) mood = '';
+  status = cleanText(readLS(STATUS_KEY, ''));
+  buildMoodGrid();
+  buildEmoGrid();
+  renderZoneBar();
+  refreshIdentity();
+  updateCount();
+  setStatusText('offline', false);
+
+  // Returning visitors who already opted in skip the gate.
+  if(readLS(AUTOJOIN_KEY, '') === '1') connect();
 </script>
 </body>
 </html>

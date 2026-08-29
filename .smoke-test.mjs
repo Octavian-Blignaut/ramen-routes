@@ -3,14 +3,35 @@
  * then exercises the flows that used to be broken.
  */
 import { spawn } from 'node:child_process';
-import { mkdtempSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, readFileSync, createReadStream } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, extname } from 'node:path';
+import { createServer } from 'node:http';
 
 const CHROME = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-const URL_UNDER_TEST = 'http://localhost:8899/index.html';
-const PORT = 9333;
 
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+// Serve docs/ ourselves on an ephemeral port. A separately-started server on a
+// mismatched port silently produces a blank page and a cascade of confusing
+// failures, so the suite owns its own.
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
+               '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml' };
+const docRoot = new URL('./docs/', import.meta.url);
+const server = createServer((req, res) => {
+  const path = decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html';
+  const file = new URL(path, docRoot);
+  createReadStream(file)
+    .on('open', () => res.writeHead(200, { 'Content-Type': MIME[extname(path)] || 'application/octet-stream' }))
+    .on('error', () => { res.writeHead(404).end('not found'); })
+    .pipe(res);
+});
+await new Promise(r => server.listen(0, '127.0.0.1', r));
+const URL_UNDER_TEST = `http://127.0.0.1:${server.address().port}/index.html`;
+console.log('serving docs/ at ' + URL_UNDER_TEST);
+
+// A random port keeps a leftover Chrome from an aborted run out of the way.
+const PORT = 9400 + Math.floor(Math.random() * 400);
 const profile = mkdtempSync(join(tmpdir(), 'sq-'));
 const chrome = spawn(CHROME, [
   '--headless=new',
@@ -20,8 +41,6 @@ const chrome = spawn(CHROME, [
   '--window-size=1280,1600',
   '--hide-scrollbars',
 ], { stdio: 'ignore' });
-
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function targetUrl() {
   for (let i = 0; i < 40; i++) {
@@ -519,11 +538,184 @@ check('NEW: export produces a downloadable passport',
     return captured !== null && captured.type === 'application/json' && captured.size > 200;
   `));
 
-check('chat degrades gracefully when Firebase is unreachable',
+// ------------------------------------------------------------------ chat
+// Firebase's database + auth hosts are blocked above, so these exercise the
+// parts of the lounge that must work with no network at all.
+
+check('CHAT: nothing connects until asked (Spark has 100 connection slots)',
   await evaluate(`
-    const log = document.getElementById('chatLog').textContent;
-    return /connecting|offline/i.test(log);
+    const gate = document.getElementById('chatGate');
+    const live = document.getElementById('chatLive');
+    return !gate.hidden && live.hidden
+      && /offline/i.test(document.getElementById('chatStatus').textContent);
   `));
+
+check('CHAT: identity defaults to anonymous with no profile set',
+  await evaluate(`
+    return document.getElementById('chatAnonBadge').textContent.trim() === 'anonymous';
+  `));
+
+check('CHAT: mood and emoticon pickers are populated',
+  await evaluate(`
+    const moods = document.querySelectorAll('#moodGrid .mood-btn').length;
+    const emos  = document.querySelectorAll('#emoGrid .emo-btn').length;
+    const zones = document.querySelectorAll('#zoneBar .zone-tab').length;
+    return moods >= 10 && emos >= 12 && zones >= 5;
+  `));
+
+check('CHAT: .help works offline and lists dot commands',
+  await evaluate(`
+    const log = document.getElementById('chatLog');
+    log.replaceChildren();
+    document.getElementById('chatHelpBtn').click();
+    const t = log.textContent;
+    return /\\.nick/.test(t) && /\\.mood/.test(t) && /\\.join/.test(t) && /\\.buzz/.test(t);
+  `));
+
+check('CHAT: emoticon tokens render as glyphs, not raw text',
+  await evaluate(`
+    const log = document.getElementById('chatLog');
+    log.replaceChildren();
+    document.getElementById('chatInput').value = '.status feeling :) today';
+    document.getElementById('chatForm').dispatchEvent(new Event('submit',{cancelable:true}));
+    const emo = log.querySelector('.emo');
+    return !!emo && emo.textContent === '\\u{1F642}' && emo.title === ':)';
+  `));
+
+check('CHAT: hostile nickname text cannot become markup',
+  await evaluate(`
+    const log = document.getElementById('chatLog');
+    log.replaceChildren();
+    document.getElementById('chatInput').value = '.ignore <img src=x onerror=alert(1)><b>bold';
+    document.getElementById('chatForm').dispatchEvent(new Event('submit',{cancelable:true}));
+    // Truncated to the 20-char nickname cap, and present as text rather than markup.
+    return log.querySelector('img, b, script') === null
+      && log.textContent.includes('<img src=x')
+      && window.__xssFired !== true;
+  `));
+
+check('CHAT: control characters are stripped from nicknames',
+  await evaluate(`
+    const input = document.getElementById('chatInput');
+    const form  = document.getElementById('chatForm');
+    input.value = '.nick Bad\\u0007Nick\\u202Eflip';
+    form.dispatchEvent(new Event('submit',{cancelable:true}));
+    const shown = document.getElementById('chatMyNick').textContent;
+    return !/[\\u0000-\\u001f]/.test(shown) && shown.startsWith('BadNick');
+  `));
+
+check('CHAT: guest_ prefix is reserved so anonymous handles cannot be spoofed',
+  await evaluate(`
+    const log = document.getElementById('chatLog');
+    const input = document.getElementById('chatInput');
+    const form = document.getElementById('chatForm');
+    input.value = '.anon'; form.dispatchEvent(new Event('submit',{cancelable:true}));
+    log.replaceChildren();
+    input.value = '.nick guest_0001'; form.dispatchEvent(new Event('submit',{cancelable:true}));
+    return /reserved/i.test(log.textContent)
+      && document.getElementById('chatAnonBadge').textContent.trim() === 'anonymous'
+      && document.getElementById('chatMyNick').textContent !== 'guest_0001';
+  `));
+
+check('CHAT: setting then clearing a nickname round-trips',
+  await evaluate(`
+    const input = document.getElementById('chatInput');
+    const form  = document.getElementById('chatForm');
+    input.value = '.nick Slurpy'; form.dispatchEvent(new Event('submit',{cancelable:true}));
+    const named = document.getElementById('chatMyNick').textContent === 'Slurpy'
+      && document.getElementById('chatAnonBadge').textContent.trim() === 'nickname';
+    input.value = '.anon'; form.dispatchEvent(new Event('submit',{cancelable:true}));
+    const anon = /^guest_/.test(document.getElementById('chatMyNick').textContent)
+      && document.getElementById('chatAnonBadge').textContent.trim() === 'anonymous';
+    return named && anon;
+  `));
+
+check('CHAT: the anonymous handle exists before any connection and can be burned',
+  await evaluate(`
+    const input = document.getElementById('chatInput');
+    const form  = document.getElementById('chatForm');
+    input.value = '.anon'; form.dispatchEvent(new Event('submit',{cancelable:true}));
+    const first = document.getElementById('chatMyNick').textContent;
+    input.value = '.newid'; form.dispatchEvent(new Event('submit',{cancelable:true}));
+    const second = document.getElementById('chatMyNick').textContent;
+    return /^guest_[0-9a-f]{4}$/.test(first) && /^guest_[0-9a-f]{4}$/.test(second) && first !== second;
+  `));
+
+check('CHAT: emoticon picker inserts at the caret and updates the counter',
+  await evaluate(`
+    const input = document.getElementById('chatInput');
+    input.value = ''; input.dispatchEvent(new Event('input'));
+    document.querySelector('#emoGrid .emo-btn').click();
+    const before = input.value;
+    const closed = document.getElementById('emoPop').classList.contains('open') === false;
+    return before.trim().length > 0 && closed
+      && document.getElementById('chatCount').textContent === String(200 - input.value.length);
+  `));
+
+check('CHAT: unknown commands are reported, not sent as messages',
+  await evaluate(`
+    const log = document.getElementById('chatLog');
+    log.replaceChildren();
+    document.getElementById('chatInput').value = '.notacommand';
+    document.getElementById('chatForm').dispatchEvent(new Event('submit',{cancelable:true}));
+    return /unknown command/i.test(log.textContent);
+  `));
+
+check('CHAT: connecting with Firebase blocked falls back to the gate',
+  await (async () => {
+    await evaluate(`document.getElementById('chatConnectBtn').click(); true`);
+    await sleep(3000);
+    return evaluate(`
+      const gate = document.getElementById('chatGate');
+      const status = document.getElementById('chatStatus').textContent;
+      return !gate.hidden && /offline/i.test(status);
+    `);
+  })());
+
+// Client caps and the deployed rules have to agree or every send is refused.
+{
+  const rules = JSON.parse(readFileSync(new URL('./database.rules.json', import.meta.url), 'utf8'));
+  const msg = rules.rules.msg.$zone.$id;
+  const html = readFileSync(new URL('./docs/index.html', import.meta.url), 'utf8');
+
+  const textCap = Number((msg.x['.validate'].match(/length <= (\d+)/) || [])[1]);
+  const clientCap = Number((html.match(/const MAX_LEN = (\d+)/) || [])[1]);
+  const inputCap = Number((html.match(/id="chatInput"[\s\S]{0,200}?maxlength="(\d+)"/) || [])[1]);
+  check('CHAT: message length cap matches rules, constant and input attribute',
+    textCap === 200 && clientCap === textCap && inputCap === textCap,
+    `rules=${textCap} const=${clientCap} maxlength=${inputCap}`);
+
+  const rateWindow = Number((rules.rules.rate.$uid['.validate'].match(/\+ (\d+)\)/) || [])[1]);
+  const clientCooldown = Number((html.match(/const COOLDOWN_MS = (\d+)/) || [])[1]);
+  check('CHAT: client cooldown leaves headroom over the rules rate window',
+    clientCooldown > rateWindow, `rules=${rateWindow}ms client=${clientCooldown}ms`);
+
+  const readCap = Number((rules.rules.msg.$zone['.read'].match(/limitToLast <= (\d+)/) || [])[1]);
+  const history = Number((html.match(/const HISTORY = (\d+)/) || [])[1]);
+  check('CHAT: history query stays inside the rules read window',
+    history <= readCap, `rules allow <=${readCap}, client asks ${history}`);
+
+  check('CHAT: rules bind each message to a fresh rate stamp via the merged tree',
+    /newData\.parent\(\)\.parent\(\)\.parent\(\)\.child\('rate'\)/.test(msg['.validate'])
+      && !/root\.child\('rate'\)/.test(JSON.stringify(rules)),
+    'rate binding must use newData.parent(), not root, or every write is denied');
+
+  check('CHAT: messages are append-only and authorship is pinned to auth.uid',
+    /!data\.exists\(\)/.test(msg['.write'])
+      && msg.u['.validate'].includes("auth.uid")
+      && msg.$other['.validate'] === false
+      && msg.t['.validate'].includes('=== now'));
+
+  check('CHAT: no write rule sits at or above the message collection',
+    rules.rules['.write'] === false
+      && !('.write' in rules.rules.msg)
+      && !('.write' in rules.rules.msg.$zone),
+    'a write rule there would let anyone null the whole zone');
+
+  check('CHAT: unbounded reads are refused by the rules',
+    /query\.limitToLast != null/.test(rules.rules.msg.$zone['.read'])
+      && /query\.limitToLast != null/.test(rules.rules.who.$zone['.read']));
+}
 
 // ---------------------------------------------------------------- errors
 const realErrors = [...pageErrors, ...consoleErrors].filter(e =>
@@ -579,4 +771,5 @@ if (failedChecks.length) {
 
 ws.close();
 chrome.kill();
+server.close();
 process.exit(failedChecks.length ? 1 : 0);
