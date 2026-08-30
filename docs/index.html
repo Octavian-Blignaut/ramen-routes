@@ -1229,6 +1229,107 @@
   }
   .skip-link:focus{ left: 16px; top: 16px; }
 
+  /* ---------- KITCHEN DESK (TV + ticker) ---------- */
+  .desk-grid{
+    display:grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.9fr);
+    gap: 18px;
+    align-items: stretch;
+  }
+  .desk-col h3{
+    margin: 0 0 10px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .yt-facade{
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: #0b0b0e;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .yt-facade iframe, .yt-play{
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    border: 0;
+  }
+  .yt-play{
+    padding: 0; cursor: pointer;
+    background: #0b0b0e; color: inherit;
+    display: block;
+  }
+  .yt-play img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: saturate(0.85) contrast(1.05);
+  }
+  .yt-play-mark{
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 68px; height: 48px;
+    border-radius: 12px;
+    background: var(--crimson);
+    box-shadow: 0 8px 24px -6px var(--crimson-glow);
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .yt-play-mark i{ color: #fff; font-size: 1.15rem; margin-left: 3px; }
+  .yt-play:hover .yt-play-mark, .yt-play:focus-visible .yt-play-mark{
+    filter: brightness(1.1);
+  }
+  .yt-caption{
+    margin: 8px 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--steel);
+    line-height: 1.45;
+  }
+  .tick-list{
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .tick{
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    align-items: baseline;
+    gap: 10px;
+    padding: 12px 14px;
+    min-height: 52px;
+    border: 1px solid var(--panel-border);
+    border-radius: 4px;
+    background: rgba(255,255,255,0.025);
+  }
+  .tick-sym{
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    color: var(--ink);
+  }
+  .tick-price{
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    color: var(--ink);
+  }
+  .tick-chg{
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .tick-chg.up{ color: var(--green); }
+  .tick-chg.down{ color: var(--crimson-ink); }
+  .tick-meta{
+    margin: 10px 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--steel);
+  }
+
   /* ---------- RESPONSIVE ---------- */
   @media (max-width: 900px){
     :root{ --header-h: 168px; }
@@ -1249,6 +1350,7 @@
     .stamps-toolbar{ grid-template-columns: 1fr 1fr; }
     .stamps-toolbar .search-wrap{ grid-column: 1 / -1; }
     .card-grid{ grid-template-columns: 1fr; gap: 18px; }
+    .desk-grid{ grid-template-columns: 1fr; }
     .modal{ padding: 20px 16px; max-height: 92vh; }
     .modal-actions{ flex-direction: column-reverse; }
     .modal-actions .btn{ width:100%; }
@@ -1314,6 +1416,7 @@
     <a href="#section-stamps"><i class="fa-solid fa-stamp" aria-hidden="true"></i> Stamps</a>
     <a href="#section-badges"><i class="fa-solid fa-award" aria-hidden="true"></i> Badges</a>
     <a href="#section-leaderboard"><i class="fa-solid fa-ranking-star" aria-hidden="true"></i> Leaderboard</a>
+    <a href="#section-desk"><i class="fa-solid fa-tv" aria-hidden="true"></i> Desk</a>
     <a href="#section-chat"><i class="fa-solid fa-comments" aria-hidden="true"></i> Chat</a>
   </nav>
 </header>
@@ -1458,6 +1561,53 @@
       <i class="fa-solid fa-ranking-star" aria-hidden="true"></i> Traveler Leaderboard
     </h2>
     <ul class="leaderboard-list" id="leaderboardList"></ul>
+  </section>
+
+  <section class="panel" id="section-desk" aria-labelledby="deskHeading">
+    <h2 class="panel-title" id="deskHeading">
+      <i class="fa-solid fa-tv" aria-hidden="true"></i> Kitchen Desk
+      <span class="title-note">one bowl, three coins</span>
+    </h2>
+    <div class="desk-grid">
+      <div class="desk-col">
+        <h3>Kitchen TV</h3>
+        <div class="yt-facade" id="ytFacade" data-ytid="qM1IbmEEjzA">
+          <button type="button" class="yt-play" id="ytPlayBtn"
+                  aria-label="Play Scariest and steepest 4WD track we have ever driven, Sand Hollow Utah">
+            <img src="https://i.ytimg.com/vi/qM1IbmEEjzA/hqdefault.jpg"
+                 alt="" width="480" height="360" loading="lazy" decoding="async">
+            <span class="yt-play-mark" aria-hidden="true">
+              <i class="fa-solid fa-play"></i>
+            </span>
+          </button>
+        </div>
+        <p class="yt-caption">
+          4WD 24-7 &mdash; scariest and steepest track they&rsquo;ve driven,
+          Sand Hollow, Utah. Press play when you want the player.
+        </p>
+      </div>
+      <div class="desk-col">
+        <h3>Tape</h3>
+        <ul class="tick-list" id="tickList">
+          <li class="tick" data-coin="bitcoin">
+            <span class="tick-sym">BTC</span>
+            <span class="tick-price" id="tick-bitcoin">—</span>
+            <span class="tick-chg" id="chg-bitcoin"></span>
+          </li>
+          <li class="tick" data-coin="ethereum">
+            <span class="tick-sym">ETH</span>
+            <span class="tick-price" id="tick-ethereum">—</span>
+            <span class="tick-chg" id="chg-ethereum"></span>
+          </li>
+          <li class="tick" data-coin="solana">
+            <span class="tick-sym">SOL</span>
+            <span class="tick-price" id="tick-solana">—</span>
+            <span class="tick-chg" id="chg-solana"></span>
+          </li>
+        </ul>
+        <p class="tick-meta" id="tickMeta">BTC, ETH, SOL &middot; CoinGecko &middot; every 60s</p>
+      </div>
+    </div>
   </section>
 
   <section class="panel" id="section-chat" aria-labelledby="chatHeading">
@@ -3527,7 +3677,7 @@
         });
       });
     }, { rootMargin: '-45% 0px -50% 0px' });
-    ['section-map','section-stamps','section-badges','section-leaderboard','section-chat']
+    ['section-map','section-stamps','section-badges','section-leaderboard','section-desk','section-chat']
       .forEach(id => { const el = $(id); if(el) observer.observe(el); });
   }
 
@@ -3611,7 +3761,91 @@
   });
 
   /* =========================================================================
-     21. INIT
+     21. KITCHEN DESK — YouTube facade + CoinGecko ticker
+     ========================================================================= */
+
+  function initKitchenDesk(){
+    const facade = $('ytFacade');
+    const playBtn = $('ytPlayBtn');
+    if(facade && playBtn){
+      const warm = () => {
+        if(document.querySelector('link[data-yt-warm]')) return;
+        const l = document.createElement('link');
+        l.rel = 'preconnect';
+        l.href = 'https://www.youtube-nocookie.com';
+        l.setAttribute('data-yt-warm', '1');
+        document.head.appendChild(l);
+      };
+      playBtn.addEventListener('pointerenter', warm);
+      playBtn.addEventListener('focus', warm);
+      playBtn.addEventListener('click', function(){
+        const id = facade.getAttribute('data-ytid');
+        if(!id) return;
+        const origin = encodeURIComponent(location.origin);
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id)
+          + '?autoplay=1&rel=0&modestbranding=1&origin=' + origin;
+        iframe.title = playBtn.getAttribute('aria-label') || 'YouTube video';
+        iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        facade.replaceChildren(iframe);
+      });
+    }
+
+    const COINS = ['bitcoin', 'ethereum', 'solana'];
+    const TICK_URL = 'https://api.coingecko.com/api/v3/simple/price'
+      + '?ids=' + COINS.join(',') + '&vs_currencies=usd&include_24hr_change=true';
+    const meta = $('tickMeta');
+    let tickTimer = null;
+
+    function fmtUsd(n){
+      if(typeof n !== 'number' || !isFinite(n)) return '—';
+      const opts = n >= 1000
+        ? { maximumFractionDigits: 0 }
+        : { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+      return '$' + n.toLocaleString('en-US', opts);
+    }
+    function fmtChg(n){
+      if(typeof n !== 'number' || !isFinite(n)) return '';
+      const sign = n > 0 ? '+' : '';
+      return sign + n.toFixed(1) + '%';
+    }
+
+    async function refreshTicks(){
+      if(document.hidden) return;
+      try {
+        const res = await fetch(TICK_URL, { headers: { accept: 'application/json' } });
+        if(!res.ok) throw new Error('http ' + res.status);
+        const data = await res.json();
+        COINS.forEach(id => {
+          const row = data[id] || {};
+          const priceEl = $('tick-' + id);
+          const chgEl = $('chg-' + id);
+          if(priceEl) priceEl.textContent = fmtUsd(row.usd);
+          if(chgEl){
+            const chg = row.usd_24h_change;
+            chgEl.textContent = fmtChg(chg);
+            chgEl.classList.toggle('up', typeof chg === 'number' && chg > 0);
+            chgEl.classList.toggle('down', typeof chg === 'number' && chg < 0);
+          }
+        });
+        if(meta) meta.textContent = 'BTC, ETH, SOL · CoinGecko · ' + new Date().toTimeString().slice(0, 5);
+      } catch(_){
+        if(meta) meta.textContent = 'BTC, ETH, SOL · CoinGecko unreachable — prices will retry';
+      }
+    }
+
+    refreshTicks();
+    tickTimer = setInterval(refreshTicks, 60000);
+    document.addEventListener('visibilitychange', function(){
+      if(!document.hidden) refreshTicks();
+    });
+    window.addEventListener('pagehide', function(){ clearInterval(tickTimer); });
+  }
+
+  /* =========================================================================
+     22. INIT
      ========================================================================= */
 
   $('year').textContent = new Date().getFullYear();
@@ -3619,6 +3853,7 @@
   buildSwatches();
   renderTravelerTag();
   initMap();
+  initKitchenDesk();
   renderAll();
   updateStorageNote();
   updateCoordHint();

@@ -105,7 +105,13 @@ await send('Log.enable');
 // Block the geocoder and Firebase so the test is deterministic and offline-safe.
 await send('Network.enable');
 await send('Network.setBlockedURLs', {
-  urls: ['*nominatim.openstreetmap.org*', '*firebaseio.com*', '*googleapis.com/identitytoolkit*'],
+  urls: [
+    '*nominatim.openstreetmap.org*',
+    '*firebaseio.com*',
+    '*googleapis.com/identitytoolkit*',
+    '*api.coingecko.com*',
+    '*youtube-nocookie.com*',
+  ],
 });
 
 await send('Page.navigate', { url: URL_UNDER_TEST });
@@ -554,6 +560,29 @@ check('NEW: export produces a downloadable passport',
     document.getElementById('exportBtn').click();
     URL.createObjectURL = origCreate;
     return captured !== null && captured.type === 'application/json' && captured.size > 200;
+  `));
+
+// ------------------------------------------------------------------ desk
+check('DESK: Kitchen TV has no YouTube iframe until play is pressed',
+  await evaluate(`
+    const facade = document.getElementById('ytFacade');
+    const before = facade.querySelectorAll('iframe').length === 0
+      && !!document.getElementById('ytPlayBtn');
+    document.getElementById('ytPlayBtn').click();
+    const frame = facade.querySelector('iframe');
+    return before
+      && !!frame
+      && /youtube-nocookie\\.com\\/embed\\/qM1IbmEEjzA/.test(frame.src)
+      && /autoplay=1/.test(frame.src)
+      && facade.querySelectorAll('iframe').length === 1;
+  `));
+
+check('DESK: tape lists BTC ETH SOL and degrades when CoinGecko is blocked',
+  await evaluate(`
+    const syms = [...document.querySelectorAll('#tickList .tick-sym')].map(el => el.textContent.trim());
+    const meta = document.getElementById('tickMeta').textContent;
+    return syms.join(' ') === 'BTC ETH SOL'
+      && /CoinGecko/i.test(meta);
   `));
 
 // ------------------------------------------------------------------ chat
